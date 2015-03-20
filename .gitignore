@@ -1,4 +1,7 @@
-**/**.png
-**/**.gif
-.png
+# first line must not contain any rules
 
+media-files/*
+tmp/*
+logs/*
+
+!.gitignore
