@@ -10,7 +10,8 @@ function S = SetupWorld(L,nu,N,M,dt,nsteps, epsilon)
 
     S.epsilon = epsilon;
 
-    % time constants
+    % time values
+    S.t = 0;
     S.dt = dt;
     S.nsteps = nsteps;
     S.tmax = dt*nsteps;
@@ -20,6 +21,12 @@ function S = SetupWorld(L,nu,N,M,dt,nsteps, epsilon)
     S.x = (0:N-1)*L/N;
     [S.x1,S.x2,S.x3] = ndgrid(S.x,S.x,S.x);
 
+    % space interpolation
+    
+    S.GridInterp = griddedInterpolant(...
+        S.x1,S.x2,S.x3,...
+        zeros(N,N,N));
+    
     % k-space vectors
     S.k = -N /2:N/2-1;
 

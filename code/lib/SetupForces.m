@@ -4,5 +4,5 @@ function F = SetupForces(S)
 frel = S.mrel * S.g;
 F.fgx = frel * 0;
 F.fgy = frel *  0;
-F.fgz = frel * -1;
+F.fgz = frel * 1;
 
