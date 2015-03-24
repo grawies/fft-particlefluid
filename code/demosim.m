@@ -70,9 +70,8 @@ for n = 1:S.nmax
         tic;
         
         PlotAll(S,P,Plt,[-90,0],...
-            [false,true,true,true,true]...
+            [false,true,true,false,false]...
             );
-        CaptureFrame(Plt);
         
         t_plot = t_plot + toc;
     end
