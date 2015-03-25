@@ -1,24 +1,18 @@
 %% PRELIMINARIES
 
-addpath('lib');
-addpath('lib/fft_shifted');
-addpath('lib/plotting');
+Init(0);
 
-rng(0);
-L=2*pi;
+L=4*2*pi;
 N = 16;
-S = SetupWorld(L, N,...
-                16, 300,...
-                0.01, 200,...
-                L/N);
+epsilon = L/16;
+S = SetupWorld(L, 0.4,... 
+                N, 1000,... % N,M
+                0.01, 1000,... % dt, nsteps
+                epsilon);
 
 P = SetupParticles(S, 'sphere', 0.5, 0.0);
 
-%% FUNTIONS, EQUATION PROPERTIES
-
 F = SetupForces(S);
-
-% delta function half-width
 
 %% DO (...WHILE)
 
