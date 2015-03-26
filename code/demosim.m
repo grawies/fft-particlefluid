@@ -2,12 +2,12 @@
 
 Init(0);
 
-L=4*2*pi;
-N = 16;
+L=2*2*pi;
+N = 2*16;
 epsilon = L/16;
 S = SetupWorld(L, 0.4,... 
                 N, 1000,... % N,M
-                0.01, 1000,... % dt, nsteps
+                0.01, 200,... % dt, nsteps
                 epsilon);
 
 P = SetupParticles(S, 'sphere', 0.5, 0.0);
@@ -16,7 +16,7 @@ F = SetupForces(S);
 
 %% DO (...WHILE)
 
-F.hdeltasum = CalcDeltaSum(S, P, F);
+F.hdeltasum = CalcDeltaSumLocally(S, P, F);
 
 [F.fx, F.fy, F.fz] = CalcGridForces(S, P, F);
 
@@ -40,7 +40,7 @@ for n = 1:S.nmax
     
     % calculate forcing function from particles
     tic;
-    F.hdeltasum = CalcDeltaSum(S,P,F);
+    F.hdeltasum = CalcDeltaSumLocally(S,P,F);
     t_deltainterp = t_deltainterp + toc;
     
     tic;

@@ -9,7 +9,9 @@ function S = SetupWorld(L,nu,N,M,dt,nsteps, epsilon)
     S.M = M;
 
     S.epsilon = epsilon;
-
+    S.dI = round( epsilon * N / L ) + 1; % +1 just in case
+    S.dIvals = -S.dI:S.dI;
+    
     % time values
     S.t = 0;
     S.dt = dt;
