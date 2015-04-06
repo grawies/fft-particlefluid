@@ -1,4 +1,4 @@
-function S = SetupWorld(L,nu,N,M,dt,nsteps, epsilon)
+function [S,F] = SetupWorld(L,nu,N,M,dt,nsteps, epsilon)
 
     S.L = L;
     S.nu = nu;
@@ -9,6 +9,7 @@ function S = SetupWorld(L,nu,N,M,dt,nsteps, epsilon)
     S.M = M;
 
     S.epsilon = epsilon;
+    
     S.dI = round( epsilon * N / L ) + 1; % +1 just in case
     S.dIvals = -S.dI:S.dI;
     
@@ -42,7 +43,9 @@ function S = SetupWorld(L,nu,N,M,dt,nsteps, epsilon)
     S.ksqinvsq(N/2+1,N/2+1,N/2+1) = 0;
 
     % fourier solver constants
-    S.C1 = S.ksqinv / S.nu;
-    S.C2 = S.ksqinvsq / S.nu;
+    S.C1 = (S.L /2/pi)^2 * S.ksqinv / S.nu;
+    S.C2 = (S.L /2/pi)^2 * S.ksqinvsq / S.nu;
 
+    % setup forces
+    F = SetupForces(S);
 end

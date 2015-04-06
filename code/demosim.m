@@ -5,14 +5,16 @@ Init(0);
 L=2*2*pi;
 N = 2*16;
 epsilon = L/16;
-S = SetupWorld(L, 0.4,... 
+
+[S,F] = SetupWorld(L, 0.4,... 
                 N, 1000,... % N,M
                 0.01, 200,... % dt, nsteps
                 epsilon);
 
 P = SetupParticles(S, 'sphere', 0.5, 0.0);
 
-F = SetupForces(S);
+% plot specs
+Plt = SetupPlotting(S, 8, 10);
 
 %% DO (...WHILE)
 
@@ -23,9 +25,7 @@ F.hdeltasum = CalcDeltaSumLocally(S, P, F);
 % calculate stokes flow from the particle force
 [S.u, S.v, S.w] = SolveStokes(S,P,F);
 
-%% SIMULATION TIME STEPPING
-% plot specs
-Plt = SetupPlotting(S, 8, 10);
+%% ...WHILE: SIMULATION TIME STEPPING 
 
 % timing variables
 t_deltainterp = 0;

@@ -1,6 +1,6 @@
 %% DATA COLLECTION
 
-n = 7;
+n = 6;
 n0 = 3;
 udata = zeros(2^n,2^n,2^n,n-n0+1);
 vdata = zeros(2^n,2^n,2^n,n-n0+1);
@@ -11,7 +11,7 @@ for i = n0:n
     i
     r = (2^n - 2^i)/2;
     pad = [r,r,r];
-    [u,v,w] = CalcInitialFlowWithL(2^i*pi, 2^i);
+    [u,v,w] = CalcInitialFlow(2^i*pi, 2^i, true);
     up = k*padarray(u,pad,0);
     vp = k*padarray(v,pad,0);
     wp = k*padarray(w,pad,0);

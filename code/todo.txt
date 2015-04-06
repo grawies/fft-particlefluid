@@ -1,0 +1,6 @@
+CalcDeltaSumLocally_CardinalSplines.m
+> replace triangle-deltas with cardinal splines code
+
+CalcInitialFlowWithL.m
+> try again, this time iwth updated derivatives
+
