@@ -3,7 +3,10 @@
 media-files/*
 tmp/*
 logs/*
-
+*.aux
+*.log
+*.out
+*.toc
 **~
 
 !.gitignore
