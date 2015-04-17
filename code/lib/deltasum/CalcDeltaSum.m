@@ -1,4 +1,4 @@
-function hdeltasum = CalcDeltaSumNaive(S,P,F)
+function hdeltasum = CalcDeltaSum(S,P,F)
 
     hdeltasum = 0;
 

@@ -4,27 +4,42 @@ function hdeltasum = CalcDeltaSumLocally(S,P,F)
     
     
     ivals = S.dIvals;
-    [di,dj,dk] = ndgrid(ivals,ivals,ivals);
+    [di,dj,dk] = ndgrid(ivals);
     N = S.N;
+    % get the indices corresponding to the grid point closest to each
+    % particle
     i0vals = 1 + round(S.N/S.L * P.x1);
     j0vals = 1 + round(S.N/S.L * P.x2);
     k0vals = 1 + round(S.N/S.L * P.x3);
         
     for m = 1:S.M
         % for each particle
-        % add delta sum locally
+        % add its local contribution the the delta sum
+        
         i0 = i0vals(m);
         j0 = j0vals(m);
         k0 = k0vals(m);
         
-        idxi = i0+ivals;
-        idxj = j0+ivals;
-        idxk = k0+ivals;
+        % this code gets intervals of indices within epsilon of particle m
+        % does this even mean anything?
+        idxi = i0 + ivals;
+        idxj = j0 + ivals;
+        idxk = k0 + ivals;
         
+        % this code gets a cube of indices within epsilon of particle m
         i = i0+di;
         j = j0+dj;
         k = k0+dk;
         
+        % restrict indices to { 1,2,...,N }
+        %{
+        i = mod(i-1, N) + 1;
+        j = mod(j-1, N) + 1;
+        k = mod(k-1, N) + 1;
+        idxi = mod(idxi-1, N) + 1;
+        idxj = mod(idxj-1, N) + 1;
+        idxk = mod(idxk-1, N) + 1;
+        %}
         if (i0 + S.dI > N ||...
             j0 + S.dI > N ||...
             k0 + S.dI > N ||...

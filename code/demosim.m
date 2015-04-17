@@ -2,14 +2,14 @@
 
 Init(0);
 
-L=2*2*pi;
-N = 2*16;
+L=2*pi;
+N = 32;
 epsilon = L/16;
 
 [S,F] = SetupWorld(L, 0.4,... 
                 N, 1000,... % N,M
-                0.01, 200,... % dt, nsteps
-                epsilon);
+                0.01, 100,... % dt, nsteps
+                'spline',4);% epsilon);
 
 P = SetupParticles(S, 'sphere', 0.5, 0.0);
 
@@ -18,7 +18,8 @@ Plt = SetupPlotting(S, 8, 10);
 
 %% DO (...WHILE)
 
-F.hdeltasum = CalcDeltaSumLocally(S, P, F);
+F.hdeltasum = CalcDeltaSumLocally_CardinalSplines(S, P, F);
+%F.hdeltasum = CalcDeltaSumLocally(S, P, F);
 
 [F.fx, F.fy, F.fz] = CalcGridForces(S, P, F);
 
@@ -40,7 +41,8 @@ for n = 1:S.nmax
     
     % calculate forcing function from particles
     tic;
-    F.hdeltasum = CalcDeltaSumLocally(S,P,F);
+    F.hdeltasum = CalcDeltaSumLocally_CardinalSplines(S, P, F);
+    %F.hdeltasum = CalcDeltaSumLocally(S,P,F);
     t_deltainterp = t_deltainterp + toc;
     
     tic;
