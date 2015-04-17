@@ -44,9 +44,6 @@ linkcolor=black, citecolor=black, urlcolor=blue]{hyperref}
 Analytic solutions for systems of many particles in fluid dynamics and electrostatics are few and far-between. Simulations are therefore essential to studying these systems. Studied in this project is the simulation of a group of particles sedimenting in a fluid. This is commonly done without directly calculating the fluid's velocity field - for example in \cite{fallingclouds} - as in a three dimensional setting with N gridpoints along each dimension gives an $O(N^3)$ scale to the problem. Finding fast methods of performing calculations on this large set can be simplified by making the (intensely debated) assumption of a periodic grid - assuming that the N$^3$-point cube is replicated much like the primitive cells of a crystal lattice. This introduces a periodicity which makes room for fourier methods and - for smooth functions - spectral (exponential) convergence in solutions and the use of the fast fourier transform, which in some places reduced the complexity to $O(NlogN)$. This is done for example in \cite{fluctuatesediment}. In this project a specific method of using the fourier transform is studied, applied to a ball of particles sedimenting in a fluid affected by gravity, and compared to similuar studies of the same system. The purpose is to evaluate this method in comparison with present work on the same simulation.
 \subsection{Sedimenting suspensions of small particles}
 ref "Falling clouds of particles in viscous fluids" (Metzger, Nicolas, Guazzelli)
-\subsection{Fourier methods}
-\subsection{Regularizing delta functions}
-A method of spreading or smearing a delta function to an N-dimensional grid is explained here. The method is taken from \cite{spectralewald} and \cite{interfaceregularization}.
 \subsection{Purpose of this study}
 \subsection{Delimitations}
 
@@ -69,6 +66,7 @@ $\left(STUFF\right)$\\
 \subsubsection{Solving differential equations using the fft}
 (Also scaling the fourier transform, for use in \ref{cellscaling})
 \subsection{Regularized delta functions}
+A method of spreading or smearing a delta function to an N-dimensional grid is explained here. The method is taken from \cite{spectralewald} and \cite{interfaceregularization}.
 \subsection{Other ways of doing things}
 For example the Stokeslet is a popular way of doing things.
 
@@ -118,6 +116,8 @@ At the moment the method with cardinal splines is not working, as can be seen in
 \subsection{Phenomena}
 The evolution of the cloud shape in a periodic box appears to agree with that observed by Metzger et al \cite{fallingclouds} in a non-periodic setting. The sedimenting ball becomes oblate, forms a torus and eventually breaks into two smaller clouds. This can be confirmed in more detail by studying e.g. the particle density along the z-axis in the cloud center, the pressure gradient in and surrounding the cloud, the velocity field in and around the cloud.\\
 For too few gridpoints the cloud appears to take a square shape, aligned with the grid cells. When this effect in practice disappears can be studied further, e.g. by plotting the particle density as a function of azimuthal angle.\\
+
+\section{Discussion}
 
 \section{Conclusions}
 
