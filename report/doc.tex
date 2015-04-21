@@ -65,31 +65,36 @@ A method of spreading or smearing a delta function to an N-dimensional grid is e
 For example the Stokeslet is a popular way of doing things.
 
 \section{Setup and algorithms}
+\subsection{The scene}
+The system in question is a cloud of $M$ particles randomly placed within a sphere of radius $r_0$. This sphere begins in the center of a primitive cell, a cube of side length $L$, which is periodically repeated throughout space.\\
+The particles are affected by a gravitational force downward and a lift from the fluid. The resulting force on the particles is the sole driving force in the simulation.\\
+The force from the particles on the fluid make up the forcing function in Stokes' equation.
 \subsection{The four-step simulation}
 
 \image{solver-principle-transparent}{The simulation algorithm steps\label{fig:simprinciple}}
 Each timestep the simulation has four distinct moments, as illustrated in figure \ref{fig:simprinciple}.
 
-Step 1: Interpolating from particle positions to grid positions
-Gravitationskraften på partiklarna interpoleras till ett kubiskt 3D-grid på vilket vätskans hastighetsfält ska beräknas. Detta görs genom att en punktkraft – deltafunktion – representeras av en	 blobb – regulariserad deltafunktion, t ex gaussian eller bara en hatt – som evalueras I gridpunkterna. Detta interpolerar de M utspridda punktkrafterna till $N^3$ punktkrafter I griddet.
+Step 1: Interpolating from particle positions to grid positions\\
+The gravitational force on the particles manifests as singular functions in the Stokes' equation forcing function. To evaluate this force on the grid, the singular functions are regularized to the grid by representing them with regularized $\delta$-functions and evaluating these on the grid.\\ This interpolates the $M$ point forces to a forcing function on the $N^3$-grid.\\
+Step 2: Solving Stokes' equation\\
+Given the forcing function it is a matter of solving Stokes' equation. This is done using the fft (and thereby the periodicity assumption), giving the following formula derived in appendix.\\
+\begin{align}
+\hat{\mathbf{u}}_\mathbf{k} &= \frac{1}{\nu k^2} \left( \hat{\mathbf{f}}_\mathbf{k} - \mathbf{k} \frac{\mathbf{k}\cdot \hat{\mathbf{f}}_\mathbf{k}}{k^2} \right)
+\end{align}
 
-Steg 2: Lös ekvationen
-Nu när kraftfältet på griddet är uträknat så har vi ett högerled I Stokes ekvation, vilken vi löser med hjälp av snabba fouriertransformen. Det är här antagandet om periodiskt flöde kommer in.
+Step 3: Interpolate the velocity field to the particle positions\\
+This is simply done by cubic interpolation using Matlab's builtin function \emph{gridinterp}.\\
+Step 4: Timestepping the particles\\
+Given the particle velocities, the particles' positions can now be calculated using Euler's method.\\
 
-Steg 3: Interpolera hastighetsfältet till partiklarnas positioner
-Detta steg har inte studerats ingående, utan genomförs med enkel polynomisk interpolation. Här används Matlabs inbyggda funktion gridinterp för att interpolera gridvärdena till partiklarnas positioner.
-
-Steg 4: Tidsstega fram partiklarna
-Här används enkelt Eulers stegmetod eller liknande för att stega fram partiklarna med fluidens hastighet.
-
-För att endast studera exempelvis konvergensen I lösningsmetoden för hastighetsfältet givet partiklarnas positioner så räcker steg 1-2. Stokes ekvationer beror enbart av forcingfunktionen I högerledet och därför beror lösningen vid tiden t enbart på partiklarnas position vid tiden t, ej deras tidigare positioner.
+If the only interest is studying the velocity field solution on the grid, steps 1-2 are sufficient. This can be done for any time $t$ in the simulation, as Stokes' equation is \emph{memoryless}, it does not depend on the history of neither the velocity field nor the forcing functions.
 
 \subsection{The particle cloud setup used here}
 
 \section{Results}
 
-\subsection{Fundamental properties of the methods used}
-\subsection{Fourier Convergence results}
+\subsection{Verifying some fundamental properties of the methods involved}
+\subsubsection{Fourier Convergence results}
 Fouriermetoder är effektiva vid låg upplösning tack vare spektral konvergens, eller exponentiell konvergens, för släta/glatta funktioner. Det går att visa [REF] att $c_k \approx |k|^{-n}$ för $f \in C^{n-1}$.
 Med denna enklaste deltafunktions-utsmetning så bör fourier koefficienterna avta som $|k|^{-1}$.
 Nedan ses vad som händer för fixerat epsilon. Jämför med senare 
@@ -97,6 +102,7 @@ konvergens hos hastighetsfältetslösningar
 Låter vi epsilon ~ 1/N så avtar felnormen som ~ $N^{-2.97}$, medan epsilon fixt ger felet ~ $N^{-2.52}$. I det senare fallet fås tydligt inte den spektrala konvergens vi hade kunnat förvänta oss om de regulariserade deltafunktionerna hade varit glatta funktioner.
 \plot{eps-conv/varying_deltas_2norms_small}{Normed successive differences in solutions as N increases and epsilon decreasing with it.}
 \plot{eps-conv/fixed_deltas_2norms_small}{Normed successive differences in solutions as N increases, keeping epsilon fixed.}
+\subsection{}
 
 \subsection{scaling the primitive cell}\label{cellscale}
 Unlike the system studied by Metzger et al \cite{fallingclouds}, the system studied in this article is periodic. If the cloud of particles is too large compared to the period of the system it is not unlikely to have interactions between clouds of different primitive cells. This can be studied by scaling the length of the primitive cells and looking at the differences between successive solutions for the velocity field in a cube of fixed size containing the particle cloud. The error decreases as ~ $L^{-0.87}$.
