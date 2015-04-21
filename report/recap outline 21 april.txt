@@ -1,3 +1,7 @@
+
+### Now used.
+
+
 		=== INTRODUCTION ===
 
 	What am I doing?
@@ -45,6 +49,8 @@ Wise words.
 Bla bla bla.
 
 		=== APPENDIX ===
-
-Fourier, deltas, periodicity
+	What did the reader not neccessarily need to know from me?
+Some fourier theory, scaling.
+Something on moments of delta functions.
+Some notes on the periodicity assumption.
 
