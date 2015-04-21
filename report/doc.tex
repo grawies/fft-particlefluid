@@ -41,31 +41,25 @@ linkcolor=black, citecolor=black, urlcolor=blue]{hyperref}
 \tableofcontents
 
 \section{Introduction}
-Analytic solutions for systems of many particles in fluid dynamics and electrostatics are few and far-between. Simulations are therefore essential to studying these systems. Studied in this project is the simulation of a group of particles sedimenting in a fluid. This is commonly done without directly calculating the fluid's velocity field - for example in \cite{fallingclouds} - as in a three dimensional setting with N gridpoints along each dimension gives an $O(N^3)$ scale to the problem. Finding fast methods of performing calculations on this large set can be simplified by making the (intensely debated) assumption of a periodic grid - assuming that the N$^3$-point cube is replicated much like the primitive cells of a crystal lattice. This introduces a periodicity which makes room for fourier methods and - for smooth functions - spectral (exponential) convergence in solutions and the use of the fast fourier transform, which in some places reduced the complexity to $O(NlogN)$. This is done for example in \cite{fluctuatesediment}. In this project a specific method of using the fourier transform is studied, applied to a ball of particles sedimenting in a fluid affected by gravity, and compared to similuar studies of the same system. The purpose is to evaluate this method in comparison with present work on the same simulation.
+Analytic solutions for systems of many particles in fluid dynamics and electrostatics are few and far-between. Simulations are therefore essential to studying these systems. In this project is the simulation of a group of particles sedimenting in a fluid. This is commonly done without directly calculating the fluid's velocity field - for example in \cite{fallingclouds} - as in a three dimensional setting with N gridpoints along each dimension gives an $O(N^3)$ scale to the problem. Finding fast methods of performing calculations on this large set can be simplified by making the (intensely debated) assumption of a periodic grid - assuming that the N$^3$-point cube is replicated much like the primitive cells of a crystal lattice. This introduces a periodicity which makes room for fourier methods and - for smooth functions - spectral (exponential) convergence in solutions and the use of the fast fourier transform, which in some places reduced the complexity to $O(NlogN)$. This is done for example in \cite{fluctuatesediment}. In this project a specific method of using the fourier transform is studied, applied to a ball of particles sedimenting in a fluid affected by gravity, and compared to similuar studies of the same system. The purpose is to evaluate this method in comparison with present work on the same simulation.
+
 \subsection{Sedimenting suspensions of small particles}
-ref "Falling clouds of particles in viscous fluids" (Metzger, Nicolas, Guazzelli)
+
 \subsection{Purpose of this study}
+To implement a spectral method for simulation of small, spherical particles sedimenting in a fluid.\\
+To verify some fundamental properties of the methods used.\\
+To compare this method to other methods employed by others. This is done by looking at convergence, differences in flow etc.\\
+To compare how this method introduces new and preserves macroscopic phenomena, compared to how the other methods behave.
 \subsection{Delimitations}
-
+I limit the point2grid interp to epsilon hats and delta blobs.\\
+I limit the grid2point interp to some simple built-in function.\\
+I limit the time step to Euler forward.\\
+I limit the primitive periodic cell to a cubic NxNxN grid.\\
+I do not go much into comparing the evolution of the point clouds.\\
 \section{Theory}
-\subsection{Stoke's equation}
-\subsection{Fourier series}
-The Fourier series coefficient $\mathcal{F}(f)_{\mathbf{k}}$ of a function $f$ on the volume $V=[0,L)^3$ is taken to be
-\begin{align}
-\mathcal{F}(f)_{\mathbf{k}} &= \frac{1}{L^3} \int_V e^{-\frac{2\pi}{L}i(\mathbf{k}\cdot \mathbf{x})}f(\mathbf{x})d\mathbf{x}
-    \label{eq:fourierdef}
-\end{align}
-The coefficients for the gradient coefficients are
-\begin{align}
-\mathcal{F}(\nabla f)_{\mathbf{k}} &= \frac{2\pi}{L}i\mathbf{k} \mathcal{F}(f)_{\mathbf{k}}
-\end{align}
-and so Stoke's equation can be written in fourier space as \\
-$\left(STUFF\right)$\\
-...here \eqref{eq:fourierdef} will be discretized to show how it relates to the DFT in Matlab \cite{matlabdft}.
-
-\subsubsection{Solving differential equations using the fft}
-(Also scaling the fourier transform, for use in \ref{cellscaling})
-\subsection{Regularized delta functions}
+\subsection{Stokes' equation}
+\subsection{Discretization}
+\subsection{Regularization}
 A method of spreading or smearing a delta function to an N-dimensional grid is explained here. The method is taken from \cite{spectralewald} and \cite{interfaceregularization}.
 \subsection{Other ways of doing things}
 For example the Stokeslet is a popular way of doing things.
@@ -94,9 +88,9 @@ För att endast studera exempelvis konvergensen I lösningsmetoden för hastighe
 
 \section{Results}
 
-\subsection{Convergence results}
+\subsection{Fundamental properties of the methods used}
 \subsection{Fourier Convergence results}
-Fouriermetoder är effektiva vid låg upplösning tack vare spektral konvergens, eller exponentiell konvergens, för släta/glatta funktioner. Det går att visa [REF] att $c_k \approx |k|^-n$ för $f \in C^{n-1}$.
+Fouriermetoder är effektiva vid låg upplösning tack vare spektral konvergens, eller exponentiell konvergens, för släta/glatta funktioner. Det går att visa [REF] att $c_k \approx |k|^{-n}$ för $f \in C^{n-1}$.
 Med denna enklaste deltafunktions-utsmetning så bör fourier koefficienterna avta som $|k|^{-1}$.
 Nedan ses vad som händer för fixerat epsilon. Jämför med senare 
 konvergens hos hastighetsfältetslösningar
@@ -146,4 +140,24 @@ in differential equations},
 	
 \end{thebibliography}
 
+\section{Appendices}
+\subsection{Fourier series}
+The Fourier series coefficient $\mathcal{F}(f)_{\mathbf{k}}$ of a function $f$ on the volume $V=[0,L)^3$ is taken to be
+\begin{align}
+\mathcal{F}(f)_{\mathbf{k}} &= \frac{1}{L^3} \int_V e^{-\frac{2\pi}{L}i(\mathbf{k}\cdot \mathbf{x})}f(\mathbf{x})d\mathbf{x}
+    \label{eq:fourierdef}
+\end{align}
+The coefficients for the gradient coefficients are
+\begin{align}
+\mathcal{F}(\nabla f)_{\mathbf{k}} &= \frac{2\pi}{L}i\mathbf{k} \mathcal{F}(f)_{\mathbf{k}}
+\end{align}
+and so Stoke's equation can be written in fourier space as \\
+$\left(STUFF\right)$\\
+...here \eqref{eq:fourierdef} will be discretized to show how it relates to the DFT in Matlab \cite{matlabdft}.
+
+\subsubsection{Solving differential equations using the fft}
+(Also scaling the fourier transform, for use in \ref{cellscaling})
+\subsection{Stuff I did not want cluttering the main text}
+Periodicity assumption\\
+Moments and delta function regularization
 \end{document}
