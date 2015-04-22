@@ -1,7 +1,7 @@
 NAME=doc
 
 build:
-	pdflatex ${NAME}.tex
+	pdflatex ${NAME}.tex && bibtex ${NAME}.aux && pdflatex ${NAME}.tex && pdflatex ${NAME}.tex
 
 run:
 	evince ${NAME}.pdf
