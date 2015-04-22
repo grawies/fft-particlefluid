@@ -38,10 +38,14 @@ linkcolor=black, citecolor=black, urlcolor=blue]{hyperref}
 \maketitle
 \thispagestyle{empty}
 
+\begin{abstract}
+Analytic solutions for systems of many particles in fluid dynamics and electrostatics are few and far-between. Simulations are therefore essential to studying these systems. This is commonly done without directly calculating the fluid's velocity field as in as in a three dimensional setting with N gridpoints along each dimension gives an $O(N^3)$ scale to the problem. In this report a specific method of using the fourier transform is studied, applied to a ball of particles sedimenting in a fluid affected by gravity, and compared to similuar studies of the same system. The purpose is to evaluate this method in comparison with present work on the same simulation.
+\end{abstract}
+
 \tableofcontents
 
 \section{Introduction}
-Analytic solutions for systems of many particles in fluid dynamics and electrostatics are few and far-between. Simulations are therefore essential to studying these systems. In this project is the simulation of a group of particles sedimenting in a fluid. This is commonly done without directly calculating the fluid's velocity field - for example in \cite{fallingclouds} - as in a three dimensional setting with N gridpoints along each dimension gives an $O(N^3)$ scale to the problem. Finding fast methods of performing calculations on this large set can be simplified by making the (intensely debated) assumption of a periodic grid - assuming that the N$^3$-point cube is replicated much like the primitive cells of a crystal lattice. This introduces a periodicity which makes room for fourier methods and - for smooth functions - spectral (exponential) convergence in solutions and the use of the fast fourier transform, which in some places reduced the complexity to $O(NlogN)$. This is done for example in \cite{fluctuatesediment}. In this project a specific method of using the fourier transform is studied, applied to a ball of particles sedimenting in a fluid affected by gravity, and compared to similuar studies of the same system. The purpose is to evaluate this method in comparison with present work on the same simulation.
+Analytic solutions for systems of many particles in fluid dynamics and electrostatics are few and far-between. Simulations are therefore essential to studying these systems. This is commonly done without directly calculating the fluid's velocity field as in as in a three dimensional setting with N gridpoints along each dimension gives an $O(N^3)$ scale to the problem \cite{fallingclouds}. Finding fast methods of performing calculations on this large set can be simplified by making the perhaps controversial assumption of a periodic grid - assuming that the N$^3$-point cube is replicated much like the primitive cells of a crystal lattice. This introduces a periodicity which makes room for fourier methods and - for smooth functions - spectral (exponential) convergence in solutions and the use of the fast fourier transform, which in some places reduced the complexity to $O(NlogN)$ \cite{fluctuatesediment}. In this project a specific method of using the fourier transform is studied, applied to a ball of particles sedimenting in a fluid affected by gravity, and compared to similuar studies of the same system. The purpose is to evaluate this method in comparison with present work on the same simulation.
 
 \subsection{Sedimenting suspensions of small particles}
 
@@ -85,6 +89,8 @@ Here I talk about discretizing the continuous problem from the previous subsecti
 
 \subsection{Regularization}
 A method of spreading or smearing a delta function to an N-dimensional grid is explained here. The method is taken from \cite{spectralewald} and \cite{interfaceregularization}.
+\subsubsection{Triangle functions}
+\subsubsection{Cardinal splines}
 
 \subsection{Other simulation methods}
 Here the Stokeslet is discussed, and maybe some hint at Ewald summation or similar.
@@ -115,7 +121,15 @@ If the only interest is studying the velocity field solution on the grid, steps 
 
 \section{Results}
 
-\subsection{Verifying some fundamental properties of the methods involved}
+\subsection{Verifying some fundamental properties of the methods}
+\subsubsection{Spectral convergence of solutions for smooth forcing functions}
+\subsubsection{Convergence of solutions for regularized singular forcing functions}
+
+At the moment the method with cardinal splines is not working, as can be seen in plot \ref{fig:failspline}. The upper data points show the convergence for the regularization using cardinal splines, which should be considerably faster than the second data set from the delta "hats". (Author's note: it's actually working now, but I have not produced any plots and comparisons yet.)
+\plot{badsplines}{The upper segment is using splines, p=3 and 5 (overlapping). The lower segment is using epsilon hats, which clearly overtakes the splines when it comes to convergence, implying something is wrong with the implementation.\label{fig:failspline}}
+
+\subsubsection{Convergence for regularization scaling with the grid}
+\subsubsection{Moments of the regularized delta functions}
 \subsubsection{Fourier Convergence results}
 Fouriermetoder är effektiva vid låg upplösning tack vare spektral konvergens, eller exponentiell konvergens, för släta/glatta funktioner. Det går att visa [REF] att $c_k \approx |k|^{-n}$ för $f \in C^{n-1}$.
 Med denna enklaste deltafunktions-utsmetning så bör fourier koefficienterna avta som $|k|^{-1}$.
@@ -124,18 +138,12 @@ konvergens hos hastighetsfältetslösningar
 Låter vi epsilon ~ 1/N så avtar felnormen som ~ $N^{-2.97}$, medan epsilon fixt ger felet ~ $N^{-2.52}$. I det senare fallet fås tydligt inte den spektrala konvergens vi hade kunnat förvänta oss om de regulariserade deltafunktionerna hade varit glatta funktioner.
 \plot{eps-conv/varying_deltas_2norms_small}{Normed successive differences in solutions as N increases and epsilon decreasing with it.}
 \plot{eps-conv/fixed_deltas_2norms_small}{Normed successive differences in solutions as N increases, keeping epsilon fixed.}
-\subsubsection{The moments of the regularized delta functions}
-\subsubsection{}
-
-\subsection{Scaling the primitive periodic cell}\label{cellscale}
+\subsection{Comparing the solutions with other known methods}
+\subsubsection{Scaling the primitive periodic cell}\label{cellscale}
 Unlike the system studied by Metzger et al \cite{fallingclouds}, the system studied in this article is periodic. If the cloud of particles is too large compared to the period of the system it is not unlikely to have interactions between clouds of different primitive cells. This can be studied by scaling the length of the primitive cells and looking at the differences between successive solutions for the velocity field in a cube of fixed size containing the particle cloud. The error decreases as ~ $L^{-0.87}$.
 \plot{len-conv/lengthvary_small}{Normed successive differences in solutions as the primitive cell increases.}
 
-\subsection{Different regularization functions}
-At the moment the method with cardinal splines is not working, as can be seen in plot \ref{fig:failspline}. The upper data points show the convergence for the regularization using cardinal splines, which should be considerably faster than the second data set from the delta "hats". (Author's note: it's actually working now, but I have not produced any plots and comparisons yet.)
-\plot{badsplines}{The upper segment is using splines, p=3 and 5 (overlapping). The lower segment is using epsilon hats, which clearly overtakes the splines when it comes to convergence, implying something is wrong with the implementation.\label{fig:failspline}}
-
-\subsection{Phenomena}
+\subsection{Maroscopic phenomena}
 The evolution of the cloud shape in a periodic box appears to agree with that observed by Metzger et al \cite{fallingclouds} in a non-periodic setting. The sedimenting ball becomes oblate, forms a torus and eventually breaks into two smaller clouds. This can be confirmed in more detail by studying e.g. the particle density along the z-axis in the cloud center, the pressure gradient in and surrounding the cloud, the velocity field in and around the cloud.\\
 For too few gridpoints the cloud appears to take a square shape, aligned with the grid cells. When this effect in practice disappears can be studied further, e.g. by plotting the particle density as a function of azimuthal angle.\\
 
@@ -144,7 +152,7 @@ For too few gridpoints the cloud appears to take a square shape, aligned with th
 \section{Conclusions}
 
 
-\bibliography{bibliography}{}
+\bibliography{bibliography}
 \bibliographystyle{plain}
 
 \section{Appendices}
