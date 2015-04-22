@@ -3,11 +3,19 @@
 media-files/*
 tmp/*
 logs/*
+
+# bibtex
+*.bbl
+*.blg
+
+# latex
 *.aux
 *.log
 *.out
 *.toc
 report/*.pdf
-**~
+
+
+*~
 
 !.gitignore
