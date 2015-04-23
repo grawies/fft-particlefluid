@@ -7,11 +7,11 @@ N = 32;
 epsilon = L/16;
 
 [S,F] = SetupWorld(L, 0.4,... 
-                N, 1000,... % N,M
-                0.01, 100,... % dt, nsteps
+                N, 10,... % N,M
+                0.01, 1000,... % dt, nsteps
                 'spline',4);% epsilon);
 
-P = SetupParticles(S, 'sphere', 0.5, 0.0);
+P = SetupParticles(S, 'twoparticles', 0.5, 0.0);
 
 % plot specs
 Plt = SetupPlotting(S, 8, 10);

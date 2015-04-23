@@ -14,9 +14,14 @@ function P = SetupParticles(S, shape, param1, param2)
         P.x3 = .5 * S.L + r .* cos( theta );
     end
     if strcmp(shape,'uniform');
-        P.x1 = unifrnd(0,L,S.M);
-        P.x2 = unifrnd(0,L,S.M);
-        P.x3 = unifrnd(0,L,S.M);
+        P.x1 = unifrnd(0,S.L,1,S.M);
+        P.x2 = unifrnd(0,S.L,1,S.M);
+        P.x3 = unifrnd(0,S.L,1,S.M);
+    end
+    if strcmp(shape,'line');
+        P.x1 = .5*S.L*ones(1,S.M);
+        P.x2 = .5*S.L*ones(1,S.M);
+        P.x3 = unifrnd(0,S.L,1,S.M);
     end
 
     %% VELOCITIES START AT 0
