@@ -74,6 +74,7 @@ and the equations for conservation of momentum are
 \end{equation}
 
 Here $\mu$ is the viscosity of the fluid, $\mathbf{u}$ is the velocity field of the fluid, $p$ is the absolute pressure and $\mathbf{f}$ is the force on the fluid, the \emph{forcing function}. $\mathbf{u}$, $p$ and $\mathbf{f}$ are multivariate functions on $\mathbb{R}^3$.\\
+
 In some methods a periodicity assumption is made to allow for fourier methods to be used efficiently,\footnote{This controversial assumption is expanded upon in the appendix.}
 \begin{equation}
 \mathbf{u}(\mathbf{r}) = \mathbf{u}(\mathbf{r}+L\mathbf{n}),\text{ }\forall \mathbf{n} \in \mathbb{Z}^3
@@ -85,7 +86,10 @@ The set of equations in \eqref{eq:incompressible} and \eqref{eq:stokesequations}
 \end{equation}
 where $\frac{1}{\mathbf{k}}$ is taken to be $0$ for $\mathbf{k}=(0,0,0)$. \eqref{eq:fourierstokessolution} is derived in the appendix.
 \subsection{Discretization}
-Here I talk about discretizing the continuous problem from the previous subsection.
+The velocity field $\mathbf{u}$ in $[0,L)^3$ is represented by a set of values $\mathbf{u}_\mathbf{m}:=\mathbf{u}(\mathbf{m}\cdot L/N)$, for $\mathbf{m}\in I = \left\{(i,j,k) | i,j,k=1,2,...,N\right\}$.
+In other words the field $\mathbf{u}$ is described on a cubic $N\times N\times N$-grid.
+The forcing function is analogously represented by the values $\mathbf{f}_\mathbf{m}, \mathbf{m}\in I$.\\
+The Stokes equations are approximated by 
 
 \subsection{Regularization}
 A method of spreading or smearing a delta function to an N-dimensional grid is explained here. The method is taken from \cite{spectralewald} and \cite{interfaceregularization}.
@@ -143,7 +147,7 @@ Låter vi epsilon ~ 1/N så avtar felnormen som ~ $N^{-2.97}$, medan epsilon fix
 Unlike the system studied by Metzger et al \cite{fallingclouds}, the system studied in this article is periodic. If the cloud of particles is too large compared to the period of the system it is not unlikely to have interactions between clouds of different primitive cells. This can be studied by scaling the length of the primitive cells and looking at the differences between successive solutions for the velocity field in a cube of fixed size containing the particle cloud. The error decreases as ~ $L^{-0.87}$.
 \plot{len-conv/lengthvary_small}{Normed successive differences in solutions as the primitive cell increases.}
 
-\subsection{Maroscopic phenomena}
+\subsection{Macroscopic phenomena}
 The evolution of the cloud shape in a periodic box appears to agree with that observed by Metzger et al \cite{fallingclouds} in a non-periodic setting. The sedimenting ball becomes oblate, forms a torus and eventually breaks into two smaller clouds. This can be confirmed in more detail by studying e.g. the particle density along the z-axis in the cloud center, the pressure gradient in and surrounding the cloud, the velocity field in and around the cloud.\\
 For too few gridpoints the cloud appears to take a square shape, aligned with the grid cells. When this effect in practice disappears can be studied further, e.g. by plotting the particle density as a function of azimuthal angle.\\
 
