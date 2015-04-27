@@ -39,15 +39,21 @@ linkcolor=black, citecolor=black, urlcolor=blue]{hyperref}
 \thispagestyle{empty}
 
 \begin{abstract}
-Analytic solutions for systems of many particles in fluid dynamics and electrostatics are few and far-between. Simulations are therefore essential to studying these systems. This is commonly done without directly calculating the fluid's velocity field as in as in a three dimensional setting with N gridpoints along each dimension gives an $O(N^3)$ scale to the problem. In this report a specific method of using the fourier transform is studied, applied to a ball of particles sedimenting in a fluid affected by gravity, and compared to similuar studies of the same system. The purpose is to evaluate this method in comparison with present work on the same simulation.
+Analytic solutions for systems of many particles in fluid dynamics and electrostatics are few and far-between.
+Simulations are therefore essential to studying these systems.
+This is commonly done without directly calculating the fluid's velocity field.
+Calculating the field in a three dimensional setting on a cubic grid is $O(N^3)$, so finding efficient and accurate methods are of great interest.
+In this report a method using the spectral accuracy of the fourier transform is studied.
+The method is applied to a ball of particles sedimenting in a fluid affected by gravity.
+The properties of this method are compared to similar studies of the same system.
+The purpose is to map and evaluate the properties this method in comparison with present work.
 \end{abstract}
 
 \tableofcontents
 
 \section{Introduction}
-Analytic solutions for systems of many particles in fluid dynamics and electrostatics are few and far-between. Simulations are therefore essential to studying these systems. This is commonly done without directly calculating the fluid's velocity field as in as in a three dimensional setting with N gridpoints along each dimension gives an $O(N^3)$ scale to the problem \cite{fallingclouds}. Finding fast methods of performing calculations on this large set can be simplified by making the perhaps controversial assumption of a periodic grid - assuming that the N$^3$-point cube is replicated much like the primitive cells of a crystal lattice. This introduces a periodicity which makes room for fourier methods and - for smooth functions - spectral (exponential) convergence in solutions and the use of the fast fourier transform, which in some places reduced the complexity to $O(NlogN)$ \cite{fluctuatesediment}. In this project a specific method of using the fourier transform is studied, applied to a ball of particles sedimenting in a fluid affected by gravity, and compared to similuar studies of the same system. The purpose is to evaluate this method in comparison with present work on the same simulation.
-
 \subsection{Sedimenting suspensions of small particles}
+Analytic solutions for systems of many particles in fluid dynamics and electrostatics are few and far-between. Simulations are therefore essential to studying these systems. This is commonly done without directly calculating the fluid's velocity field as in as in a three dimensional setting with N gridpoints along each dimension gives an $O(N^3)$ scale to the problem \cite{fallingclouds}. Finding fast methods of performing calculations on this large set can be simplified by making the perhaps controversial assumption of a periodic grid - assuming that the N$^3$-point cube is replicated much like the primitive cells of a crystal lattice. This introduces a periodicity which makes room for fourier methods and - for smooth functions - spectral (exponential) convergence in solutions and the use of the fast fourier transform, which in some places reduced the complexity to $O(NlogN)$ \cite{fluctuatesediment}. In this project a specific method of using the fourier transform is studied, applied to a ball of particles sedimenting in a fluid affected by gravity, and compared to similuar studies of the same system. The purpose is to evaluate this method in comparison with present work on the same simulation.
 
 \subsection{Purpose of this study}
 To implement a spectral method for simulation of small, spherical particles sedimenting in a fluid.\\
@@ -92,12 +98,30 @@ The forcing function is analogously represented by the values $\mathbf{f}_\mathb
 The Stokes equations are approximated by 
 
 \subsection{Regularization}
-A method of spreading or smearing a delta function to an N-dimensional grid is explained here. The method is taken from \cite{spectralewald} and \cite{interfaceregularization}.
+The force of gravity on the particles gives a forcing function for Stokes equations,
+\begin{align}
+\mathbf{f}(\mathbf{x}) &= -g\hat{\mathbf{z}}\sum_{i=1}^M \delta (\mathbf{x}-\mathbf{x}_i)\label{eq:singularforcingfunction}\\
+&= -g\hat{\mathbf{z}}\sum_{i=1}^M \delta^\epsilon (\mathbf{x}-\mathbf{x}_i)
+\end{align}
+To evaluate the singular function in \eqref{eq:singularforcingfunction} on the grid an interpolating function $\delta^\epsilon$ is introduced.
+Some conditions are imposed on this funtion.
+$\delta^\epsilon$ should sum to $1$ corresponding to $\int \delta(\mathbf{x}) d\mathbf{x}=1$.
+$\delta^\epsilon$ should be as smooth as possible since this is the limiting factor on accuracy in \eqref{eq:fourierstokessolution}.
+Two such choices of functions are discussed in this report, mainly based on the methods in \cite{spectralewald} and \cite{interfaceregularization}.
 \subsubsection{Triangle functions}
 \subsubsection{Cardinal splines}
 
 \subsection{Other simulation methods}
-Here the Stokeslet is discussed, and maybe some hint at Ewald summation or similar.
+To circumvent the problem of calculating the Stokes flow in the simulated region a method based on the Greens function can be used.
+The solution to the Stokes equations in \eqref{eq:stokesequations} in $\mathbb{R}^3$ for the choice $\mathbf{f}(\mathbf{x}) = \delta(\mathbf{x})$ is the Stokeslet,
+\begin{equation}
+[Stokeslet]
+\end{equation}
+which gives a solution for $\mathbf{u}$ in \eqref{eq:singularforcingfunction},
+\begin{equation}
+[Solutionsum]
+\end{equation}
+...and maybe some hint at Ewald summation or similar.
 
 \section{Setup and algorithms}
 \subsection{The scene}
