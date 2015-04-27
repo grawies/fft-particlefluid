@@ -4,6 +4,9 @@ media-files/*
 tmp/*
 logs/*
 
+# gimp
+*.xcf
+
 # bibtex
 *.bbl
 *.blg
