@@ -1,5 +1,8 @@
-\documentclass[a4paper,twoside=false,abstract=false,numbers=noenddot,
+\documentclass[a4paper,
+%twocolumn,
+twoside=false,abstract=false,numbers=noenddot,
 titlepage=false,headings=small,parskip=half,version=last]{scrartcl}
+
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[english]{babel}
@@ -101,15 +104,31 @@ The Stokes equations are approximated by
 The force of gravity on the particles gives a forcing function for Stokes equations,
 \begin{align}
 \mathbf{f}(\mathbf{x}) &= -g\hat{\mathbf{z}}\sum_{i=1}^M \delta (\mathbf{x}-\mathbf{x}_i)\label{eq:singularforcingfunction}\\
-&= -g\hat{\mathbf{z}}\sum_{i=1}^M \delta^\epsilon (\mathbf{x}-\mathbf{x}_i)
+&= -g\hat{\mathbf{z}}\sum_{i=1}^M \delta^{r} (\mathbf{x}-\mathbf{x}_i)
 \end{align}
-To evaluate the singular function in \eqref{eq:singularforcingfunction} on the grid an interpolating function $\delta^\epsilon$ is introduced.
-Some conditions are imposed on this funtion.
-$\delta^\epsilon$ should sum to $1$ corresponding to $\int \delta(\mathbf{x}) d\mathbf{x}=1$.
-$\delta^\epsilon$ should be as smooth as possible since this is the limiting factor on accuracy in \eqref{eq:fourierstokessolution}.
+To evaluate the singular function in \eqref{eq:singularforcingfunction} on the grid an interpolating function $\delta^{r}$ is introduced in place of $\delta$.
+This process is called \emph{regularisation}.
+Two conditions are imposed on this regularisation funtion:
+\begin{enumerate}
+\item $\delta^{r}$ should sum to $1$. This is a discrete version of $\int \delta(\mathbf{x}) d\mathbf{x}=1$.
+\item $\delta^{r}$ should be as smooth as possible. The smoothness determines the convergence in fourier space and limits the spectral accuracy in \eqref{eq:fourierstokessolution}.
+\end{enumerate}
 Two such choices of functions are discussed in this report, mainly based on the methods in \cite{spectralewald} and \cite{interfaceregularization}.
+These choices for $\delta^{r}$ are constructed from univariate functions, $\delta^{r}(\mathbf{x}) = \delta^{r}_{1}(x) \delta^{r}_{1}(y) \delta^{r}_{1}(z)$.
+
 \subsubsection{Triangle functions}
+Perhaps the simplest choice of $\delta^{r}_{1}$ is
+\begin{equation}
+\delta^{r}_{1}(x) = max\left(1-\frac{x}{\epsilon}\text{, }0\right)
+\end{equation}
+for some small $\epsilon$.
+It can be verified that for $\epsilon=n\cdot L/N$, $n\in\mathbb{Z}$, this choice of $\delta^r$ does indeed satisfy the first condition.
+The function is continuous but without a continuous derivative.
+Therefore the fourier coefficients of $\delta^r$ decrease as $k^{-1}$.
+\image{0.6}{deltaepsilon}{Qualitative image of the triangle function choice of $\delta^{r}$.}
+
 \subsubsection{Cardinal splines}
+[Cardinal splines presentation, plot similar to Dag Lindbo's]
 
 \subsection{Other simulation methods}
 To circumvent the problem of calculating the Stokes flow in the simulated region a method based on the Greens function can be used.
@@ -124,13 +143,14 @@ which gives a solution for $\mathbf{u}$ in \eqref{eq:singularforcingfunction},
 ...and maybe some hint at Ewald summation or similar.
 
 \section{Setup and algorithms}
+
 \subsection{The scene}
 The system in question is a cloud of $M$ particles randomly placed within a sphere of radius $r_0$. This sphere begins in the center of a primitive cell, a cube of side length $L$, which is periodically repeated throughout space.\\
 The particles are affected by a gravitational force downward and a lift from the fluid. The resulting force on the particles is the sole driving force in the simulation.\\
 The force from the particles on the fluid make up the forcing function in Stokes' equation.
-\subsection{The four-step simulation}
 
-\image{solver-principle-transparent}{The simulation algorithm steps\label{fig:simprinciple}}
+\subsection{The four-step simulation}
+\image{0.35}{solver-principle-transparent}{The simulation algorithm steps\label{fig:simprinciple}}
 Each timestep the simulation has four distinct moments, as illustrated in figure \ref{fig:simprinciple}.
 
 Step 1: Interpolating from particle positions to grid positions\\
@@ -150,6 +170,7 @@ If the only interest is studying the velocity field solution on the grid, steps 
 \section{Results}
 
 \subsection{Verifying some fundamental properties of the methods}
+
 \subsubsection{Spectral convergence of solutions for smooth forcing functions}
 \subsubsection{Convergence of solutions for regularized singular forcing functions}
 
@@ -172,8 +193,13 @@ Unlike the system studied by Metzger et al \cite{fallingclouds}, the system stud
 \plot{len-conv/lengthvary_small}{Normed successive differences in solutions as the primitive cell increases.}
 
 \subsection{Macroscopic phenomena}
-The evolution of the cloud shape in a periodic box appears to agree with that observed by Metzger et al \cite{fallingclouds} in a non-periodic setting. The sedimenting ball becomes oblate, forms a torus and eventually breaks into two smaller clouds. This can be confirmed in more detail by studying e.g. the particle density along the z-axis in the cloud center, the pressure gradient in and surrounding the cloud, the velocity field in and around the cloud.\\
-For too few gridpoints the cloud appears to take a square shape, aligned with the grid cells. When this effect in practice disappears can be studied further, e.g. by plotting the particle density as a function of azimuthal angle.\\
+The evolution of the cloud shape in a periodic box appears to agree with that observed by Metzger et al \cite{fallingclouds} in a non-periodic setting.
+The sedimenting ball becomes oblate, forms a torus (see Figure \ref{fig:macro/torus-qualitative}) and eventually breaks into two smaller clouds.
+This can be compared in more detail by studying e.g. the particle density along the z-axis in the cloud center, the pressure gradient in and surrounding the cloud, the velocity field in and around the cloud.\\
+\plot{macro/torus-qualitative}{The torus shape the cloud evolves into [plot missing axes, units, \#steps, dt=0.01, N=32, M=1000 etc]\label{fig:torusplot}}
+
+For too few gridpoints the cloud appears to take a square shape aligned with the grid cells, see Figure \ref{fig:macro/torus-square}. When this effect in practice disappears can be studied further, e.g. by plotting the particle density as a function of azimuthal angle.
+\plot{macro/torus-square}{The square shape of the torus cloud for N=8 [plot missing axes, units, \#steps, dt=0.001, N=8, M=1000 etc]}
 
 \section{Discussion}
 
