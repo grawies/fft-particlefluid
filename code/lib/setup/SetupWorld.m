@@ -11,7 +11,7 @@ function [S,F] = SetupWorld(L,nu,N,M,dt,nsteps, deltaType, deltaParam)
     S.h = S.L/S.N;
     
     S.deltaType = deltaType;
-    if strcmp(deltaType, 'hat')
+    if strcmp(deltaType, 'triangle')
         S.epsilon = deltaParam;
     end
     if strcmp(deltaType, 'spline')
