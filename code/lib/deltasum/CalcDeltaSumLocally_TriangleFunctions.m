@@ -1,12 +1,13 @@
-function hdeltasum = CalcDeltaSumLocally_CardinalSplines(S,P,F)
+function hdeltasum = CalcDeltaSumLocally_TriangleFunctions(S,P,F)
+
     hdeltasum = zeros(S.N,S.N,S.N);
     
-    p = S.splineOrder;
-    hinv = S.N/S.L;
     
     ivals = S.dIvals;
     [di,dj,dk] = ndgrid(ivals);
     N = S.N;
+    h = S.L/S.N;
+    
     % get the indices corresponding to the grid point closest to each
     % particle
     i0vals = 1 + round(S.N/S.L * P.x1);
@@ -55,22 +56,15 @@ function hdeltasum = CalcDeltaSumLocally_CardinalSplines(S,P,F)
             idxk = idxk + N * (idxk < 1) - N * (idxk > N);
         end
         
-        x = S.L * (i-1) / S.N;
-        y = S.L * (j-1) / S.N;
-        z = S.L * (k-1) / S.N;
+        x = h * (i-1);
+        y = h * (j-1);
+        z = h * (k-1);
         
-        Mx = CardinalSpline(i-P.x1(m)*hinv, p);
-        My = CardinalSpline(j-P.x2(m)*hinv, p);
-        Mz = CardinalSpline(k-P.x3(m)*hinv, p);
-        
-        hdeltasum(idxi,idxj,idxk) = hdeltasum(idxi,idxj,idxk)...
-            + Mx.*My.*Mz;
+        hdeltasum(idxi,idxj,idxk) = hdeltasum(idxi,idxj,idxk) + ...
+            max(1-abs(x-P.x1(m))/S.epsilon,0).*...
+            max(1-abs(y-P.x2(m))/S.epsilon,0).*...
+            max(1-abs(z-P.x3(m))/S.epsilon,0);
             
-        
-        %hdeltasum(idxi,idxj,idxk) = hdeltasum(idxi,idxj,idxk) + ...
-        %    max(1-abs(x-P.x1(m))/S.epsilon,0).*...
-        %    max(1-abs(y-P.x2(m))/S.epsilon,0).*...
-        %    max(1-abs(z-P.x3(m))/S.epsilon,0);
     end
     
-end 
+end
