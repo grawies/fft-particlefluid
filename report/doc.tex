@@ -12,6 +12,9 @@ linkcolor=black, citecolor=black, urlcolor=blue]{hyperref}
 \usepackage{graphicx}
 \usepackage{multirow}
 
+% bibliography and citations
+\usepackage{natbib}
+
 \usepackage{tikz}
 \usetikzlibrary{matrix}
 
@@ -82,53 +85,140 @@ and the equations for conservation of momentum are
 \mu \nabla^2 \mathbf{u} = \nabla p - \mathbf{f} \label{eq:stokesequations}
 \end{equation}
 
-Here $\mu$ is the viscosity of the fluid, $\mathbf{u}$ is the velocity field of the fluid, $p$ is the absolute pressure and $\mathbf{f}$ is the force on the fluid, the \emph{forcing function}. $\mathbf{u}$, $p$ and $\mathbf{f}$ are multivariate functions on $\mathbb{R}^3$.\\
+Here $\mu$ is the dynamic viscosity of the fluid, $\mathbf{u}$ is the velocity field of the fluid, $p$ is the absolute pressure and $\mathbf{f}$ is the volume force on the fluid, the \emph{forcing function}. $\mathbf{u}$, $p$ and $\mathbf{f}$ are multivariate functions on $\mathbf{R}^3$.
 
-In some methods a periodicity assumption is made to allow for fourier methods to be used efficiently,\footnote{This controversial assumption is expanded upon in the appendix.}
+The particle system is assumed to be periodic in three dimensions, i.e. the system and all its characteristics within the volume $[0,L)^3$ is assumed to repeat in the $x$-,$y$- and $z$-directions.
+In terms of $\mathbf{f}$,
 \begin{equation}
-\mathbf{u}(\mathbf{r}) = \mathbf{u}(\mathbf{r}+L\mathbf{n}),\text{ }\forall \mathbf{n} \in \mathbb{Z}^3
+\mathbf{f}(\mathbf{r}) = \mathbf{f}(\mathbf{r}+L\mathbf{m}),\text{ }\forall \mathbf{m} \in \mathbb{Z}^3
 \end{equation}
-Thus if $\mathbf{u}$ is known in $[0,L)^3$, it is known in $\mathbb{R}^3$.\\
-The set of equations in \eqref{eq:incompressible} and \eqref{eq:stokesequations} are solvable in $\mathbf{k}$-space for the fourier coefficients $\left\{\hat{\mathbf{u}}_\mathbf{k}\right\}$,
-\begin{equation}
-\hat{\mathbf{u}}_\mathbf{k} = \frac{1}{\nu k^2} \left( \hat{\mathbf{f}}_\mathbf{k} - \mathbf{k} \frac{\mathbf{k}\cdot \hat{\mathbf{f}}_\mathbf{k}}{k^2} \right) \label{eq:fourierstokessolution}
-\end{equation}
-where $\frac{1}{\mathbf{k}}$ is taken to be $0$ for $\mathbf{k}=(0,0,0)$. \eqref{eq:fourierstokessolution} is derived in the appendix.
-\subsection{Discretization}
-The velocity field $\mathbf{u}$ in $[0,L)^3$ is represented by a set of values $\mathbf{u}_\mathbf{m}:=\mathbf{u}(\mathbf{m}\cdot L/N)$, for $\mathbf{m}\in I = \left\{(i,j,k) | i,j,k=1,2,...,N\right\}$.
-In other words the field $\mathbf{u}$ is described on a cubic $N\times N\times N$-grid.
-The forcing function is analogously represented by the values $\mathbf{f}_\mathbf{m}, \mathbf{m}\in I$.\\
-The Stokes equations are approximated by 
+Thus if $\mathbf{f}$ is known in $[0,L)^3$, it is known in $\mathbf{R}^3$. Analogously $\mathbf{u}$ and $p$ are assumed to be periodic.
 
-\subsection{Regularization}
-The force of gravity on the particles gives a forcing function for Stokes equations,
-\begin{align}
-\mathbf{f}(\mathbf{x}) &= -g\hat{\mathbf{z}}\sum_{i=1}^M \delta (\mathbf{x}-\mathbf{x}_i)\label{eq:singularforcingfunction}\\
-&= -g\hat{\mathbf{z}}\sum_{i=1}^M \delta^{r} (\mathbf{x}-\mathbf{x}_i)
+\subsection{Fourier analysis}
+Studying the Stokes equations \eqref{eq:incompressible} and \eqref{eq:stokesequations} in fourier space one can find an explicit solution for $\mathbf{u}$ in Stokes equations in terms of $\mathbf{f}$.\\
+The Fourier series coefficient $\mathcal{F}(f)_{\mathbf{k}}$ with wavevector $\mathbf{k}$ of a function $f$ on the volume $V=[0,L)^3$ is taken to be
+\begin{align}%\frac{1}{L^3} on in fourier transform integral?
+\mathcal{F}(f)_{\mathbf{k}} &= \int_V f(\mathbf{x}) e^{-\frac{2\pi}{L}i(\mathbf{k}\cdot \mathbf{x})}d\mathbf{x}
+    \label{eq:fourierdef}
 \end{align}
+The coefficients for the gradient coefficients are thus
+\begin{align}
+\mathcal{F}(\nabla f)_{\mathbf{k}} &= \frac{2\pi}{L}i\mathbf{k} \mathcal{F}(f)_{\mathbf{k}}
+\end{align}
+Taking the fourier transform of \eqref{eq:incompressible} and \eqref{eq:stokesequations} yields a new set of equations,
+\begin{align}
+\mathbf{k}\cdot \mathcal{F}(\mathbf{u})_\mathbf{k}&=0\label{eq:incompressible-fourier}\\
+-\mu\left(\frac{2\pi}{L}\right)^2 |\mathbf{k}|^2 \mathcal{F}(\mathbf{u})_\mathbf{k} &= i\frac{2\pi}{L}\mathbf{k}\mathcal{F}(p)_\mathbf{k}-\mathcal{F}(\mathbf{f})_\mathbf{k}\label{eq:stokesequations-fourier}
+\end{align}
+By taking the dot product of \eqref{eq:stokesequations-fourier} and using \eqref{eq:incompressible-fourier} to eliminate $\mathcal{F}(\mathbf{u})_\mathbf{k}$, a solution for $\mathcal{F}(p)_\mathbf{k}$ is found.
+Substituting $\mathcal{F}(p)_\mathbf{k}$ in \eqref{eq:stokesequations-fourier} yields a solution for $\mathcal{F}(\mathbf{u})_\mathbf{k}$, $\mathbf{k}\neq\mathbf{0}$, in terms of $\mathcal{F}(\mathbf{f})_\mathbf{k}$. Finding $\mathbf{u}$ is then a matter of applying the inverse fourier transform.
+\begin{align}
+\mathcal{F}(p)_\mathbf{k}&=-i\frac{\mathbf{k}\cdot \mathcal{F}(\mathbf{f})_\mathbf{k}}{|\mathbf{k}|^2 2\pi/L}\nonumber\\
+\mathcal{F}(\mathbf{u})_\mathbf{k}&=\frac{1}{\mu|\mathbf{k}|^2}\left(\frac{2\pi}{L}\right)^2 \left(\mathcal{F}(\mathbf{f})_\mathbf{k} - \mathbf{k} \frac{\mathbf{k}\cdot \mathcal{F}(\mathbf{f})_\mathbf{k}}{|\mathbf{k}|^2}\right)\label{eq:stokessolution-fourier}
+\end{align}
+and $\mathcal{F}(\mathbf{u})_\mathbf{0}:=0$. This can be expressed in real space as
+\begin{equation}
+\int_V \mathbf{u}(\mathbf{x})d\mathbf{x} = 0
+\end{equation}
+In physical terms: there is no net flow over the boundaries of the box.
+
+% DISCRETIZATION
+\subsection{Discretization}
+The velocity field $\mathbf{u}$ in $[0,L)^3$ is represented by a set of values $\mathbf{u}_\mathbf{m}:=\mathbf{u}(h(\mathbf{m}-\mathbf{1}))$, for $\mathbf{m}\in I = \left\{(i,j,k) | i,j,k=1,2,...,N\right\}$, $h=L/N$ and $\mathbf{1}=(1,1,1)$.
+In other words the field $\mathbf{u}$ is described on a cubic $N\times N\times N$-grid by $\mathbf{u}_\mathbf{m}$, $\mathbf{m}\in I$.
+The forcing function is analogously represented by the values $\mathbf{f}_\mathbf{m}, \mathbf{m}\in I$.
+The Stokes flow is calculated directly from $\mathbf{f}_\mathbf{m}$ in \eqref{eq:stokessolution-fourier} using the fast fourier transform in Matlab.
+The 3D discrete fourier transform $\hat{f}_\mathbf{k}, \mathbf{k}\in I$ of a function representation $\mathbf{f}_\mathbf{m}, \mathbf{m}\in I$ is given by
+\begin{equation}
+\hat{f}_\mathbf{k} = \sum_{\mathbf{m}\in I} f_\mathbf{m} e^{-i\frac{2\pi \cdot }{N} \mathbf{k}\cdot (\mathbf{m}-\mathbf{1})}\nonumber
+\end{equation}
+The continuous fourier transform \eqref{eq:fourierdef} can be approximated using the discrete fourier transform,
+\begin{align}
+\mathcal{F}(f) &= \int_V f(\mathbf{x}) e^{-\frac{2\pi}{L}i(\mathbf{k}\cdot \mathbf{x})}d\mathbf{x}\nonumber\\
+	&\approx \sum_{\mathbf{m}\in I} f_\mathbf{m} e^{-i\frac{2\pi}{L}\mathbf{k}\cdot h(\mathbf{m}-\mathbf{1})} h^3\nonumber\\
+	&= h^3 \cdot \hat{f}_\mathbf{k}\nonumber
+\end{align}
+Given $\mathbf{f}_\mathbf{m}$ the discretized velocity field $\mathbf{u}_\mathbf{m}$ can be calculated from \eqref{eq:stokessolution-fourier} with the fast fourier transform.
+As the fast fourier transform has spectral convergence in $N$ the limiting factor for the convergence of solutions is the smoothness of the input, the forcing function $\mathbf{f}$.
+
+% REGULARIZATION
+\subsection{Regularization\label{section:regularization}}
+The only contribution to the forcing function in this study is the force of gravity on the system of $M$ particles,
+\begin{align}
+\mathbf{f}(\mathbf{x}) &= -\rho g\hat{\mathbf{z}}\sum_{i=1}^M \delta (\mathbf{x}-\mathbf{x}_i)\label{eq:singularforcingfunction}\\
+&= -\rho g\hat{\mathbf{z}}\sum_{i=1}^M \delta^{r} (\mathbf{x}-\mathbf{x}_i)\nonumber
+\end{align}
+where $\rho$ is the relative density of the fluid and the particles, $g$ is the gravitational constant and $\hat{\mathbf{z}}=(0,0,1)$. $\mathbf{x}_i$ is the position of particle $i$, $i=1,2,...,M$.
 To evaluate the singular function in \eqref{eq:singularforcingfunction} on the grid an interpolating function $\delta^{r}$ is introduced in place of $\delta$.
 This process is called \emph{regularisation}.
 Two conditions are imposed on this regularisation funtion:
 \begin{enumerate}
-\item $\delta^{r}$ should sum to $1$. This is a discrete version of $\int \delta(\mathbf{x}) d\mathbf{x}=1$.
-\item $\delta^{r}$ should be as smooth as possible. The smoothness determines the convergence in fourier space and limits the spectral accuracy in \eqref{eq:fourierstokessolution}.
+\item $\sum_{\mathbf{m}\in \mathbb{Z}^3}h^3\delta^{r}(h\mathbf{m}-\mathbf{x}_0) = 1$ for all $\mathbf{x}_0$. This is a discrete version of $\int \delta(\mathbf{x}) d\mathbf{x}=1$.
+\item $\delta^{r}$ should be as smooth as possible. The smoothness determines the convergence of solutions to \eqref{eq:stokessolution-fourier}.
+\item $\delta^{r}$ should have a small, compact support. This allows for relatively cheap calculation of the forcing function in real space.
 \end{enumerate}
 Two such choices of functions are discussed in this report, mainly based on the methods in \cite{spectralewald} and \cite{interfaceregularization}.
 These choices for $\delta^{r}$ are constructed from univariate functions, $\delta^{r}(\mathbf{x}) = \delta^{r}_{1}(x) \delta^{r}_{1}(y) \delta^{r}_{1}(z)$.
 
-\subsubsection{Triangle functions}
+% TRIANGLE FUNCTIONS
+\subsubsection{Triangle functions}\label{section:triangle-delta}
 Perhaps the simplest choice of $\delta^{r}_{1}$ is
 \begin{equation}
-\delta^{r}_{1}(x) = max\left(1-\frac{x}{\epsilon}\text{, }0\right)
+\delta^{r}_{1}(x) = \frac{1}{\epsilon}max\left(1-\frac{|x|}{\epsilon}\text{, }0\right)
 \end{equation}
 for some small $\epsilon$.
-It can be verified that for $\epsilon=n\cdot L/N$, $n\in\mathbb{Z}$, this choice of $\delta^r$ does indeed satisfy the first condition.
+For $\epsilon=ph$, $p\in\mathbb{Z}^+$, this choice of $\delta^r$ does indeed satisfy the first condition.
+\begin{equation}
+\sum_{\mathbf{m}\in\mathbb{Z}^3}h^3\delta^{r}(h\mathbf{m}-\mathbf{x}_0)	= \sum_{i\in \mathbb{Z}}\sum_{j\in \mathbb{Z}}\sum_{k\in \mathbb{Z}}h\delta^{r}_1(hi-x_0)h\delta^{r}_1(hj-y_0)h\delta^{r}_1(hk-z_0)\label{eq:splitdelta3dto1d}
+\end{equation}
+which by translation symmetry is equal to the cube of
+\begin{align}
+\sum_{i\in \mathbb{Z}}h\delta^{r}_1(hi-x_0) &= \sum_{i\in \mathbb{Z}}h\cdot \frac{1}{\epsilon}max\left(1-\frac{|hi-x_0|}{\epsilon}\text{, }0\right)\nonumber\\
+		& \left\{ wlog \text{ }x_0\in [0,h) \right\}\nonumber\\
+		&= \frac{h}{\epsilon} \sum_{i=-(p-1)}^p 1-\frac{|hi-x_0|}{\epsilon}\nonumber\\
+		&= \frac{2hp}{\epsilon} - \sum_{i=1}^p\frac{hi-x_0}{\epsilon^2} - \sum_{i=-(p-1)}^0\frac{x_0-hi}{\epsilon^2}\nonumber\\
+		&= \frac{2hp}{\epsilon} - \frac{2h}{\epsilon^2}\left(2\frac{p(p+1)}{2} - p \right)\nonumber\\
+		& \left\{ hp = \epsilon \right\}\nonumber\\
+		&= 1\nonumber
+\end{align}
 The function is continuous but without a continuous derivative.
 Therefore the fourier coefficients of $\delta^r$ decrease as $k^{-1}$.
-\image{0.6}{deltaepsilon}{Qualitative image of the triangle function choice of $\delta^{r}$.}
+\image{0.6}{triangledeltas}{Qualitative image of the triangle function choice of $\delta^{r}$.}
 
+% CARDINAL SPLINES
 \subsubsection{Cardinal splines}
-[Cardinal splines presentation, plot similar to Dag Lindbo's]
+Another choice of $\delta^r_1$ is found by using the cardinal B-splines $M_p$ of integer order $p,\text{ }p\geq2$ described in \cite{B-spline-paper} and \cite{spectralewald} and displayed in figure \ref{fig:splinedeltas},
+\begin{equation}
+M_p(u) = \frac{1}{(p-1)!} \sum^p_{j=0} (-1)^j \frac{p!}{j!(p-j)!}(u-j)^{p-1}_+\label{eq:cardinalspline-definition}
+\end{equation}
+where $(x)_+ := max(x,0)$.
+$M_p$ is nonzero on $(0,p)$ and is shown in \cite{B-spline-paper} to satisfy the following recursive relations with $M_2(u) = (1-|u-1|)_+$,
+\begin{align}
+M_p(u) &= \frac{u}{p-1}M_{p-1}(u) + \frac{p-u}{p-1}M_{p-1}(u-1)\label{eq:spline-recursion}\\
+\frac{d}{du}M_p(u) &= M_{p-1}(u) - M_{p-1}(u-1)\label{eq:spline-derivative-recursion}
+\end{align}
+The regularisation function is
+\begin{equation}
+\delta^r_1(hi-x_0) = h^{-1}\cdot M_p(h^{-1}(hi-x_0)+\frac{p}{2})\nonumber
+\end{equation}
+where the term $\frac{p}{2}$ translates the function graph to be symmetric around $hi=x_0$.
+This function is nonzero for $|hi-x_0| \leq \frac{ph}{2} \Leftrightarrow i \in (\frac{x_0}{h}-\frac{p}{2},\frac{x_0}{h}+\frac{p}{2})$.
+The resulting $\delta^r$ satisfies the first condition. It splits into a cube as in \eqref{eq:splitdelta3dto1d}, and
+\begin{align}
+\sum_{i\in \mathbb{Z}}h\delta^{r}_1(hi-x_0) &= \sum_{i\in \mathbb{Z}} h\cdot h^{-1} \cdot M_p(h^{-1}(hi-x_0)+\frac{p}{2})\nonumber\\
+		&= \sum_{i=0}^{p} M_p(i+\xi)\label{eq:B-spline-sum}
+\end{align}
+for some $\xi\in[0,1)$ because of translation symmetry and the compact support $[0,p]$ of $M_p$. $\sum_{i=\xi}{p+\xi}$ is taken to mean that $i$ is taken in increments of $1$. By using the recursion in \eqref{eq:spline-recursion} the expression in \eqref{eq:B-spline-sum} can be shown to be $1$ by induction.
+$M_2$ is in fact a triangle function from section \ref{section:triangle-delta} and has already been proven to sum to $1$· Assuming \eqref{eq:B-spline-sum} equals $1$ for $p-1$ and any $\xi$,
+\begin{align}
+\sum_{i=\xi}^{p+\xi} M_p(i) &= \frac{1}{p-1}\sum_{i=\xi}^{p+\xi} iM_{p-1}(i) + (p-i)M_{p-1}(i-1)\nonumber\\
+		&= \sum_{i_1=\xi}^{p+\xi} M_{p-1}(i_1-1) + \frac{1}{p-1}\sum_{i_2=\xi}^{p+\xi} i_2M_{p-1}(i_2) - \frac{1}{p-1}\sum_{i_3=\xi}^{p+\xi} (i_3-1)M_{p-1}(i_3-1)\nonumber\\
+		&= \left\{ j_1 = i_1-1\text{, } j_2 = i_2\text{, }j_3 = i_3-1\right\}\nonumber\\
+		&= \sum_{j_1=\xi}^{(p-1)+\xi} M_{p-1}(j_1) + 0 + \frac{1}{p-1}\sum_{j_2=\xi}^{p+\xi} j_2M_{p-1}(j_2) + 0 - \sum_{j_3=\xi}^{p+\xi} j_3M_{p-1}(j_3) - 0\nonumber\\
+		&= 1\nonumber
+\end{align}
+As $M_2$ is continuous it is easily deduced from \eqref{eq:spline-derivative-recursion} that $M_p$ is continuously differentiable $p-2$ times.
+\image{0.6}{splinedeltas}{Comparison of the first four even orders of cardinal B-splines, translated to be symmetric in the origin.}
 
 \subsection{Other simulation methods}
 To circumvent the problem of calculating the Stokes flow in the simulated region a method based on the Greens function can be used.
@@ -140,7 +230,7 @@ which gives a solution for $\mathbf{u}$ in \eqref{eq:singularforcingfunction},
 \begin{equation}
 [Solutionsum]
 \end{equation}
-...and maybe some hint at Ewald summation or similar.
+...and maybe some mention of Ewald summation or similar.
 
 \section{Setup and algorithms}
 
@@ -152,44 +242,56 @@ The force from the particles on the fluid make up the forcing function in Stokes
 \subsection{The four-step simulation}
 \image{0.35}{solver-principle-transparent}{The simulation algorithm steps\label{fig:simprinciple}}
 Each timestep the simulation has four distinct moments, as illustrated in figure \ref{fig:simprinciple}.
+\begin{enumerate}
+\item{Interpolating from particle positions to grid positions}\\
+The gravitational force on the particles manifests as singular functions in the Stokes' equation forcing function. To evaluate this force on the grid, the singular functions are regularized to the grid by representing them with regularized $\delta$-functions and evaluating these on the grid.\\ This interpolates the $M$ point forces to a forcing function on the $N^3$-grid.
 
-Step 1: Interpolating from particle positions to grid positions\\
-The gravitational force on the particles manifests as singular functions in the Stokes' equation forcing function. To evaluate this force on the grid, the singular functions are regularized to the grid by representing them with regularized $\delta$-functions and evaluating these on the grid.\\ This interpolates the $M$ point forces to a forcing function on the $N^3$-grid.\\
-Step 2: Solving Stokes' equation\\
+\item{Solving Stokes' equation}\\
 Given the forcing function it is a matter of solving Stokes' equation. This is done using the fft (and thereby the periodicity assumption), giving the following formula derived in appendix.
 
-Step 3: Interpolate the velocity field to the particle positions\\
-This is simply done by cubic interpolation using Matlab's builtin function \emph{gridinterp}.\\
-Step 4: Timestepping the particles\\
-Given the particle velocities, the particles' positions can now be calculated using Euler's method.\\
+\item{Interpolate the velocity field to the particle positions}\\
+This is simply done by cubic interpolation using Matlab's builtin function \emph{gridinterp}.
 
+\item{Timestepping the particles}\\
+Given the particle velocities, the particles' positions can now be calculated using Euler's method.
+\end{enumerate}
 If the only interest is studying the velocity field solution on the grid, steps 1-2 are sufficient. This can be done for any time $t$ in the simulation, as Stokes' equation is \emph{memoryless}, it does not depend on the history of neither the velocity field nor the forcing functions.
 
 \subsection{The particle cloud setup used here}
+
+Two systems of particles are studied in this article.
+The first and simplest systems has $M=3$ particles placed along a central $z$-axis in the primitive cell, two clustered to display the increase in velocity as they drag more fluid together.
+The second, larger system has a cloud of $M~10^3$ particles uniformly distributed over a ball, initially in the center of the primitive cell. This is similar to the system studied in \cite{fallingclouds}.
 
 \section{Results}
 
 \subsection{Verifying some fundamental properties of the methods}
 
-\subsubsection{Spectral convergence of solutions for smooth forcing functions}
-\subsubsection{Convergence of solutions for regularized singular forcing functions}
+\subsubsection{Convergence of the Stokes flow}
+The convergence of the solution obtained through \eqref{eq:stokessolution-fourier} depends on the smoothness of the forcing function $\mathbf{f}$.
+The convergence of solutions for a smooth and a non-smooth forcing function can be seen in figure \ref{fig:soln-conv/conv-cmp}.
+The smooth function is ($L=2.0$) $g_1(x,y,z) = sin(Lcos(\frac{2\pi}{L}x))cos(\frac{2\pi}{L}y) + sin(\frac{2\pi}{L}z)$ and the non-smooth is $g_2(x,y,z) = sin(\frac{2\pi}{L}x)cos(\frac{2\pi}{L}y)(\frac{2}{L^2}z^3 - \frac{3}{L} z^2 + z)$. $g_2$ is continuously differentiable once.
+The non-smooth solution converges as $N^{-2.29}$.
+\plot{soln-conv/conv-cmp}{Comparison of the Stokes flow solutions for a smooth and a non-smooth forcing function.}
 
-At the moment the method with cardinal splines is not working, as can be seen in plot \ref{fig:failspline}. The upper data points show the convergence for the regularization using cardinal splines, which should be considerably faster than the second data set from the delta "hats". (Author's note: it's actually working now, but I have not produced any plots and comparisons yet.)
-\plot{badsplines}{The upper segment is using splines, p=3 and 5 (overlapping). The lower segment is using epsilon hats, which clearly overtakes the splines when it comes to convergence, implying something is wrong with the implementation.\label{fig:failspline}}
+\subsubsection{Characteristics of solutions for regularized singular forcing functions}
+Here the forcing function in \eqref{eq:singularforcingfunction} is introduced. The regularized forcing functions and respective solutions to Stokes equations for a system with $M=3$ particles along a central line along the $z$-axis is displayed in figure \ref{fig:regularization/regul-char-tmp}
+\plot{regularization/regul-char-tmp}{The particle positions, shape of the regularized point forces and Stokes flow for given particle positions. Here $L=2\pi$, $N=128$, $\epsilon=4h$.}
 
 \subsubsection{Convergence for regularization scaling with the grid}
-\subsubsection{Moments of the regularized delta functions}
+%\subsubsection{Moments of the regularized delta functions}
 \subsubsection{Fourier Convergence results}
-Fouriermetoder är effektiva vid låg upplösning tack vare spektral konvergens, eller exponentiell konvergens, för släta/glatta funktioner. Det går att visa [REF] att $c_k \approx |k|^{-n}$ för $f \in C^{n-1}$.
-Med denna enklaste deltafunktions-utsmetning så bör fourier koefficienterna avta som $|k|^{-1}$.
-Nedan ses vad som händer för fixerat epsilon. Jämför med senare 
-konvergens hos hastighetsfältetslösningar
-Låter vi epsilon ~ 1/N så avtar felnormen som ~ $N^{-2.97}$, medan epsilon fixt ger felet ~ $N^{-2.52}$. I det senare fallet fås tydligt inte den spektrala konvergens vi hade kunnat förvänta oss om de regulariserade deltafunktionerna hade varit glatta funktioner.
 \plot{eps-conv/varying_deltas_2norms_small}{Normed successive differences in solutions as N increases and epsilon decreasing with it.}
 \plot{eps-conv/fixed_deltas_2norms_small}{Normed successive differences in solutions as N increases, keeping epsilon fixed.}
+
 \subsection{Comparing the solutions with other known methods}
+The system studied in this article is not the same system initially presented. The system uses discretized functions and an assumption of  periodicity has been made. It is thus of interest to study how this simulation method compares to other takes on the particle system.
 \subsubsection{Scaling the primitive periodic cell}\label{cellscale}
-Unlike the system studied by Metzger et al \cite{fallingclouds}, the system studied in this article is periodic. If the cloud of particles is too large compared to the period of the system it is not unlikely to have interactions between clouds of different primitive cells. This can be studied by scaling the length of the primitive cells and looking at the differences between successive solutions for the velocity field in a cube of fixed size containing the particle cloud. The error decreases as ~ $L^{-0.87}$.
+If the cloud of particles is of the same magnitude as the period of the system it is not unlikely to have interactions between clouds of different primitive cells.
+This can be studied by scaling the length of the primitive cells while keeping the particle cloud size fixed and looking at the differences between successive solutions for the velocity field in a cube of fixed size containing the particle cloud.
+For simple triangle functions, the successive relative differences decrease as $L^{-1.30}$.
+However, the meaning of this measure in not entirely obvious.
+For each value of $L$ a different physical system is studied. The solutions for these systems should converge to the non-periodic case as $L\rightarrow \infty$.
 \plot{len-conv/lengthvary_small}{Normed successive differences in solutions as the primitive cell increases.}
 
 \subsection{Macroscopic phenomena}
@@ -210,23 +312,5 @@ For too few gridpoints the cloud appears to take a square shape aligned with the
 \bibliographystyle{plain}
 
 \section{Appendices}
-\subsection{Fourier series}
-The Fourier series coefficient $\mathcal{F}(f)_{\mathbf{k}}$ of a function $f$ on the volume $V=[0,L)^3$ is taken to be
-\begin{align}
-\mathcal{F}(f)_{\mathbf{k}} &= \frac{1}{L^3} \int_V e^{-\frac{2\pi}{L}i(\mathbf{k}\cdot \mathbf{x})}f(\mathbf{x})d\mathbf{x}
-    \label{eq:fourierdef}
-\end{align}
-The coefficients for the gradient coefficients are
-\begin{align}
-\mathcal{F}(\nabla f)_{\mathbf{k}} &= \frac{2\pi}{L}i\mathbf{k} \mathcal{F}(f)_{\mathbf{k}}
-\end{align}
-and so Stoke's equation can be written in fourier space as \\
-$\left(STUFF\right)$\\
-...here \eqref{eq:fourierdef} will be discretized to show how it relates to the DFT in Matlab \cite{matlab}.
-
-\subsubsection{Solving differential equations using the fft}
-(Also scaling the fourier transform, for use in \ref{cellscaling})
-\subsection{Stuff I did not want cluttering the main text}
-Periodicity assumption\\
-Moments and delta function regularization
+\subsection{Appendix A: Assuming periodicity}
 \end{document}
