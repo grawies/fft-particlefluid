@@ -11,17 +11,19 @@ function [S,F] = SetupWorld(L,nu,N,M,dt,nsteps, deltaType, deltaParam)
     S.h = S.L/S.N;
     
     S.deltaType = deltaType;
+    S.hmult = deltaParam(1);
+    
     if strcmp(deltaType, 'triangle')
-        S.epsilon = deltaParam;
+        S.splineOrder = 2;
     end
     if strcmp(deltaType, 'spline')
-        S.splineOrder = deltaParam;
-        S.epsilon = S.splineOrder/2 * S.h;
+        S.splineOrder = deltaParam(2);
     end
-    
-    S.dI = round( S.epsilon * N / L ) + 1; % +1 just in case
+    S.epsilon = S.h * S.hmult * S.splineOrder/2;
+    % contains S.hmult*S.splineOrder/2 h's in either direction
+    S.dI = round(S.hmult*S.splineOrder/2) + 1; % +1 just in case
     S.dIvals = -S.dI:S.dI;
-    
+            
     % time values
     S.t = 0;
     S.dt = dt;

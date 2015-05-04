@@ -9,7 +9,7 @@ epsilon = L/16;
 [S,F] = SetupWorld(L, 0.4,... 
                 N, 8,... % N,M
                 0.01, 1000,... % dt, nsteps
-                'spline',4);% epsilon);
+                'spline',[1,4]);
 
 P = SetupParticles(S, 'line', 0.5, 0.0);
 

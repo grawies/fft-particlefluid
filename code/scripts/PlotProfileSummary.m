@@ -1,7 +1,7 @@
 LocalInit(0);
 
-%[x,p,f,u] = Get1DProfile(2*pi, 128, 3, 'triangle',2*pi/32);
-[x,p,f,u] = Get1DProfile(2*pi, 128, 3, 'spline', 5);
+%[x,p,f,u] = Get1DProfile(2*pi, 128, 3, 'triangle',8);
+[x,p,f,u] = Get1DProfile(2*pi, 128, 3, 'spline', [1 5]);
 
 plot(p,zeros(max(size(p)),1),'k*');
 hold on;
