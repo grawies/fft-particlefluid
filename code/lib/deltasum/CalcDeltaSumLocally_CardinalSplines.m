@@ -52,9 +52,9 @@ function hdeltasum = CalcDeltaSumLocally_CardinalSplines(S,P,F)
             k = k + N * (k < 1) - N * (k > N);
             idxk = idxk + N * (idxk < 1) - N * (idxk > N);
         end
-        Mx = CardinalSpline(i-P.x1(m)*hinv, p);
-        My = CardinalSpline(j-P.x2(m)*hinv, p);
-        Mz = CardinalSpline(k-P.x3(m)*hinv, p);
+        Mx = CardinalSpline(i-P.x1(m)*hinv*hmultinv, p);
+        My = CardinalSpline(j-P.x2(m)*hinv*hmultinv, p);
+        Mz = CardinalSpline(k-P.x3(m)*hinv*hmultinv, p);
         %{
         Mx = CardinalSpline(hmultinv*(i-P.x1(m)*hinv), p);
         My = CardinalSpline(hmultinv*(j-P.x2(m)*hinv), p);
