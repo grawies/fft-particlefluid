@@ -1,35 +1,36 @@
-LocalInit(0);
- 
-%[x,p,f,u] = Get1DProfile(2*pi, 128, 3, 'triangle',8);
-L = 2.0;
-N = 128;
-M = 3;
-[~,~,ftS,utS] = Get1DProfile(L, N, M, 'triangle', [4 5]);
-[~,~,ftL,utL] = Get1DProfile(L, N, M, 'spline', [8 5]);
-[~,~,fsSS,usSS] = Get1DProfile(L, N, M, 'spline', [1 2]);
-[~,~,fsSM,usSM] = Get1DProfile(L, N, M, 'spline', [1 4]);
-[x,p,fsSL,usSL] = Get1DProfile(L, N, M, 'spline', [1 6]);
+function PlotProfileSummary(x,p,f,u,legendList)
+
+Nplots = max(size(u));
 
 %% plot the velocity field
 figure(1)
-set(gca,'YDir','reverse'); hold all
-plot(p,zeros(max(size(p)),1),'k*');
-plot(x,usSS);
-plot(x,usSM);
-plot(x,usSL);
-plot(x,utS);
-plot(x,utL);
-
-%% plot the profiles
-figure(2)
-plot(p,zeros(max(size(p)),1),'k*');
-
-xlabel('z-value','FontSize',12);
-
-axes(ax(1)); ylabel('-f','FontSize',12);
-%axis([0 2*pi 0 2]);
-axes(ax(2)); ylabel('-u','FontSize',12);
-%axis([0 2*pi 0 0.01]);
+set(gca,'YDir','reverse');
 grid on;
-title('triangle regularization','FontSize',12);
-legend('solution','particles','forcing function');
+hold all
+plot(p,zeros(max(size(p)),1),'k*');
+for i=1:Nplots
+    plot(x,u{i});
+end
+set(gca,'FontSize',11);
+legend(legendList)
+xlabel('z-axis position [m]')
+ylabel('velocity along central z-axis [m/s]')
+title('velocity field profile for different regularization functions')
+
+%% plot the regularized particle distributions
+figure(2)
+set(gca,'YDir','reverse'); 
+grid on;
+hold all
+plot(p,zeros(max(size(p)),1),'k*');
+for i=1:Nplots
+    plot(x,f{i});
+end
+set(gca,'FontSize',11);
+legend(legendList)
+xlabel('z-axis position [m]')
+ylabel('force along central z-axis [N/m^3]')
+title('forcing function profiles for different regularization functions')
+ 
+ 
+ 

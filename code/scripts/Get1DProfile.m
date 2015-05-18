@@ -1,5 +1,5 @@
-%% PRELIMINARIES
 function [x,p,f,u] = Get1DProfile(L,N,M,method,methodParam)
+    %% PRELIMINARIES
     LocalInit(0);
     [S,F] = SetupWorld(L, 1,... 
                     N, M,... % N,M
@@ -12,10 +12,12 @@ function [x,p,f,u] = Get1DProfile(L,N,M,method,methodParam)
         P.x3 = zList(1:M);
     end
     
-    %% DO (...WHILE)
+    %% CALCULATION
 
     F.hdeltasum = CalcDeltaSumLocally(S, P, F);
-    (S.L/S.N)^3 * sum(F.hdeltasum(:))
+    
+    %sum(F.hdeltasum(:)) * (S.L/S.N)^3
+    
     [F.fx, F.fy, F.fz] = CalcGridForces(S, P, F);
     % calculate stokes flow from the particle force
     [S.u, S.v, S.w] = SolveStokes(S,P,F);

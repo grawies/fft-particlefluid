@@ -19,6 +19,7 @@ function [S,F] = SetupWorld(L,nu,N,M,dt,nsteps, deltaType, deltaParam)
     if strcmp(deltaType, 'spline')
         S.splineOrder = deltaParam(2);
     end
+    
     S.epsilon = S.h * S.hmult * S.splineOrder/2;
     % contains S.hmult*S.splineOrder/2 h's in either direction
     S.dI = round(S.hmult*S.splineOrder/2) + 1; % +1 just in case

@@ -11,6 +11,7 @@ function Plt = SetupPlotting(S, nlines, plotinterval)
     % init recording
     Plt.vidfig = figure(1);
     Plt.frames = S.nsteps;
+    %Plt.frameset = [];
     Plt.Vid(Plt.frames) = struct('cdata',[],'colormap',[]);
     Plt.framecount = 1;
 

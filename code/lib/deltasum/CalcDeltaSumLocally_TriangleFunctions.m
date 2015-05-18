@@ -7,7 +7,7 @@ function hdeltasum = CalcDeltaSumLocally_TriangleFunctions(S,P,F)
     [di,dj,dk] = ndgrid(ivals);
     N = S.N;
     h = S.L/S.N;
-    
+    epsiloninvcube = 1 / S.epsilon^3;
     % get the indices corresponding to the grid point closest to each
     % particle
     i0vals = 1 + round(S.N/S.L * P.x1);
@@ -61,6 +61,7 @@ function hdeltasum = CalcDeltaSumLocally_TriangleFunctions(S,P,F)
         z = h * (k-1);
         
         hdeltasum(idxi,idxj,idxk) = hdeltasum(idxi,idxj,idxk) + ...
+            epsiloninvcube * ...
             max(1-abs(x-P.x1(m))/S.epsilon,0).*...
             max(1-abs(y-P.x2(m))/S.epsilon,0).*...
             max(1-abs(z-P.x3(m))/S.epsilon,0);

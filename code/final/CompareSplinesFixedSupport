@@ -1,0 +1,23 @@
+LocalInit(0);
+
+L = 2.0;
+N = 256;
+M = 3;
+
+[x,p,fa,ua] = Get1DProfile(L, N, M, 'spline', [6 2]);
+[~,~,fb,ub] = Get1DProfile(L, N, M, 'spline', [4 3]);
+[~,~,fc,uc] = Get1DProfile(L, N, M, 'spline', [3 4]);
+[~,~,fd,ud] = Get1DProfile(L, N, M, 'spline', [2 6]);
+[~,~,fe,ue] = Get1DProfile(L, N, M, 'spline', [1 12]);
+
+f = {fa,fb,fc,fd,fe};
+u = {ua,ub,uc,ud,ue};
+
+legendList = {'particle positions',...
+    'B-splines, p = 12, scale = 1',...
+    'B-splines, p = 6, scale = 2',...
+    'B-splines, p = 4, scale = 3',...
+    'B-splines, p = 3, scale = 4',...
+    'B-splines, p = 2, scale = 6'};
+
+PlotProfileSummary(x,p,f,u,legendList);

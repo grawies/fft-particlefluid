@@ -4,10 +4,12 @@ function hdeltasum = CalcDeltaSumLocally_CardinalSplines(S,P,F)
     p = S.splineOrder;
     hinv = 1.0/S.h;
     hmultinv = 1.0/S.hmult;
+    hinvcube = hinv^3;
     
     ivals = S.dIvals;
     [di,dj,dk] = ndgrid(ivals);
     N = S.N;
+    
     % get the indices corresponding to the grid point closest to each
     % particle
     i0vals = 1 + round(S.N/S.L * P.x1);
@@ -52,9 +54,9 @@ function hdeltasum = CalcDeltaSumLocally_CardinalSplines(S,P,F)
             k = k + N * (k < 1) - N * (k > N);
             idxk = idxk + N * (idxk < 1) - N * (idxk > N);
         end
-        Mx = CardinalSpline(i-P.x1(m)*hinv*hmultinv, p);
-        My = CardinalSpline(j-P.x2(m)*hinv*hmultinv, p);
-        Mz = CardinalSpline(k-P.x3(m)*hinv*hmultinv, p);
+        Mx = CardinalSpline((i-P.x1(m)*hinv)*hmultinv, p);
+        My = CardinalSpline((j-P.x2(m)*hinv)*hmultinv, p);
+        Mz = CardinalSpline((k-P.x3(m)*hinv)*hmultinv, p);
         %{
         Mx = CardinalSpline(hmultinv*(i-P.x1(m)*hinv), p);
         My = CardinalSpline(hmultinv*(j-P.x2(m)*hinv), p);
@@ -65,5 +67,5 @@ function hdeltasum = CalcDeltaSumLocally_CardinalSplines(S,P,F)
             + Mx.*My.*Mz;
         
     end
-    hdeltasum = hdeltasum * hmultinv^3;
+    hdeltasum = hdeltasum * hinvcube * hmultinv^3;
 end 
