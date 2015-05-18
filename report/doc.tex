@@ -10,13 +10,9 @@ titlepage=false,headings=small,parskip=half,version=last]{scrartcl}
 linkcolor=black, citecolor=black, urlcolor=blue]{hyperref}
 \usepackage{verbatim}
 \usepackage{graphicx}
-\usepackage{multirow}
 
 % bibliography and citations
 \usepackage{natbib}
-
-\usepackage{tikz}
-\usetikzlibrary{matrix}
 
 \usepackage{amsmath}
 \usepackage{amsthm}
@@ -35,7 +31,7 @@ linkcolor=black, citecolor=black, urlcolor=blue]{hyperref}
 \title{Suspensions with small, spherical particles}
 \subtitle{SA104X Degree Project in Engineering Physics}
     \author[2]{Samuel Zackrisson$^1$ \\ \footnotesize Supervisor: Anna-Karin Tornberg}
-    \affil[1,2]{Department for Numerical Analysis, Royal Institute of Technology}
+    \affil[2]{Numerical Analysis, Royal Institute of Technology (KTH)}
     \affil[1]{samuelz@kth.se}
     \affil[2]{akto@kth.se}
 
@@ -44,81 +40,87 @@ linkcolor=black, citecolor=black, urlcolor=blue]{hyperref}
 \maketitle
 \thispagestyle{empty}
 
+% ABSTRACT
 \begin{abstract}
-Analytic solutions for systems of many particles in fluid dynamics and electrostatics are few and far-between.
-Simulations are therefore essential to studying these systems.
-This is commonly done without directly calculating the fluid's velocity field.
-Calculating the field in a three dimensional setting on a cubic grid is $O(N^3)$, so finding efficient and accurate methods are of great interest.
-In this report a method using the spectral accuracy of the fourier transform is studied.
+Feasibly computable analytic solutions for systems of many particles in fluid dynamics and electrostatics are few and far-between.
+Simulations and numerical approximations are essential to studying these systems.
+This is commonly done without directly calculating the interacting field between particles.
+Simply storing a discretized field in a three dimensional setting on a cubic $N\times N\times N$-grid is $O(N^3)$, so finding efficient and accurate methods are of great interest.
+In this report a method utilizing the spectral accuracy of the Fourier transform is studied.
 The method is applied to a ball of particles sedimenting in a fluid affected by gravity.
 The properties of this method are compared to similar studies of the same system.
-The purpose is to map and evaluate the properties this method in comparison with present work.
+The purpose is to map and evaluate the properties of this method in comparison with present work.
 \end{abstract}
 
 \tableofcontents
 
+% INTRODUCTION
 \section{Introduction}
 \subsection{Sedimenting suspensions of small particles}
-Analytic solutions for systems of many particles in fluid dynamics and electrostatics are few and far-between. Simulations are therefore essential to studying these systems. This is commonly done without directly calculating the fluid's velocity field as in as in a three dimensional setting with N gridpoints along each dimension gives an $O(N^3)$ scale to the problem \cite{fallingclouds}. Finding fast methods of performing calculations on this large set can be simplified by making the perhaps controversial assumption of a periodic grid - assuming that the N$^3$-point cube is replicated much like the primitive cells of a crystal lattice. This introduces a periodicity which makes room for fourier methods and - for smooth functions - spectral (exponential) convergence in solutions and the use of the fast fourier transform, which in some places reduced the complexity to $O(NlogN)$ \cite{fluctuatesediment}. In this project a specific method of using the fourier transform is studied, applied to a ball of particles sedimenting in a fluid affected by gravity, and compared to similuar studies of the same system. The purpose is to evaluate this method in comparison with present work on the same simulation.
+Feasibly computable analytic solutions for systems of many particles in fluid dynamics and electrostatics are few and far-between.
+Simulations and numerical approximations are essential to studying these systems.
+This is commonly done without directly calculating the interacting field between particles.
+Simply storing a discretized field in a three dimensional setting on a cubic $N\times N\times N$-grid is $O(N^3)$, so finding efficient and accurate methods are of great interest.
+Finding fast methods of performing calculations on this large set can be simplified by making the assumption of a periodic grid - assuming that the $N^3$-point cube is replicated much like the primitive cells of a crystal lattice. This introduces a periodicity which makes room for Fourier methods and - for smooth functions - spectral (exponential) convergence in solutions and the use of the fast Fourier transform, which in some places reduced the complexity to $O(NlogN)$ \cite{fluctuatesediment}. In this project a specific method of using the Fourier transform is studied, applied to a ball of particles sedimenting in a fluid affected by gravity, and compared to similuar studies of the same system. The purpose is to evaluate this method in comparison with present work on the same simulation.
 
+% PURPOSE
 \subsection{Purpose of this study}
 To implement a spectral method for simulation of small, spherical particles sedimenting in a fluid.\\
 To verify some fundamental properties of the methods used.\\
 To compare this method to other methods employed by others. This is done by looking at convergence, differences in flow etc.\\
 To compare how this method introduces new and preserves macroscopic phenomena, compared to how the other methods behave.
-\subsection{Delimitations}
-We confine ourselves to microhydrodynamics. $Re<<1$.\\
-I limit the point2grid interp to epsilon hats and delta blobs.\\
-I limit the grid2point interp to some simple built-in function.\\
-I limit the time step to Euler forward.\\
-I limit the primitive periodic cell to a cubic NxNxN grid.\\
-I do not go much into comparing the evolution of the point clouds.\\
+
+% THEORY
 \section{Theory}
 \subsection{Stokes flow}
 For the small particles in an incompressible, viscous fluid in this study, the Reynolds number is assumed to be small ($Re<<1$). The general Navier-Stokes equations can under these conditions be approximated as a linear set of equations, the steady Stokes equations. A solution to these equations is called as a \emph{Stokes flow}. For more details on the equations as they appear here, see \cite{guazzellibook}.\\
 The continuity equation for an incompressible fluid appears as
 \begin{equation}
-\nabla \cdot \mathbf{u} = 0 \label{eq:incompressible}
+\nabla \cdot \mathbf{u} = 0, \label{eq:incompressible}
 \end{equation}
 and the equations for conservation of momentum are
 \begin{equation}
-\mu \nabla^2 \mathbf{u} = \nabla p - \mathbf{f} \label{eq:stokesequations}
+\mu \nabla^2 \mathbf{u} = \nabla p - \mathbf{f}. \label{eq:stokesequations}
 \end{equation}
 
-Here $\mu$ is the dynamic viscosity of the fluid, $\mathbf{u}$ is the velocity field of the fluid, $p$ is the absolute pressure and $\mathbf{f}$ is the volume force on the fluid, the \emph{forcing function}. $\mathbf{u}$, $p$ and $\mathbf{f}$ are multivariate functions on $\mathbf{R}^3$.
+Here $\mu$ is the dynamic viscosity of the fluid, $\mathbf{u}=(u_1,u_2,u_3)$ is the velocity field of the fluid, $p$ is the absolute pressure and $\mathbf{f}=(f_1,f_2,f_3)$ is the volume force on the fluid, the \emph{forcing function}. $\mathbf{u}$, $p$ and $\mathbf{f}$ are multivariate functions on $\mathbf{R}^3$.
 
 The particle system is assumed to be periodic in three dimensions, i.e. the system and all its characteristics within the volume $[0,L)^3$ is assumed to repeat in the $x$-,$y$- and $z$-directions.
 In terms of $\mathbf{f}$,
 \begin{equation}
-\mathbf{f}(\mathbf{r}) = \mathbf{f}(\mathbf{r}+L\mathbf{m}),\text{ }\forall \mathbf{m} \in \mathbb{Z}^3
+\mathbf{f}(\mathbf{r}) = \mathbf{f}(\mathbf{r}+L\mathbf{m}),\text{ }\forall \mathbf{m} \in \mathbb{Z}^3.
 \end{equation}
 Thus if $\mathbf{f}$ is known in $[0,L)^3$, it is known in $\mathbf{R}^3$. Analogously $\mathbf{u}$ and $p$ are assumed to be periodic.
 
 \subsection{Fourier analysis}
-Studying the Stokes equations \eqref{eq:incompressible} and \eqref{eq:stokesequations} in fourier space one can find an explicit solution for $\mathbf{u}$ in Stokes equations in terms of $\mathbf{f}$.\\
+Studying the Stokes equations \eqref{eq:incompressible} and \eqref{eq:stokesequations} in Fourier space one can find an explicit solution for $\mathbf{u}$ in Stokes equations in terms of $\mathbf{f}$.\\
 The Fourier series coefficient $\mathcal{F}(f)_{\mathbf{k}}$ with wavevector $\mathbf{k}$ of a function $f$ on the volume $V=[0,L)^3$ is taken to be
-\begin{align}%\frac{1}{L^3} on in fourier transform integral?
-\mathcal{F}(f)_{\mathbf{k}} &= \int_V f(\mathbf{x}) e^{-\frac{2\pi}{L}i(\mathbf{k}\cdot \mathbf{x})}d\mathbf{x}
+\begin{align}%\frac{1}{L^3} on in Fourier transform integral?
+\mathcal{F}(f)_{\mathbf{k}} &= \int_V f(\mathbf{x}) e^{-\frac{2\pi}{L}i(\mathbf{k}\cdot \mathbf{x})}d\mathbf{x}.
     \label{eq:fourierdef}
 \end{align}
 The coefficients for the gradient coefficients are thus
 \begin{align}
-\mathcal{F}(\nabla f)_{\mathbf{k}} &= \frac{2\pi}{L}i\mathbf{k} \mathcal{F}(f)_{\mathbf{k}}
+\mathcal{F}(\nabla f)_{\mathbf{k}} &= \frac{2\pi}{L}i\mathbf{k} \mathcal{F}(f)_{\mathbf{k}}.
 \end{align}
-Taking the fourier transform of \eqref{eq:incompressible} and \eqref{eq:stokesequations} yields a new set of equations,
+Taking the Fourier transform of \eqref{eq:incompressible} and \eqref{eq:stokesequations} yields a new set of equation.
 \begin{align}
 \mathbf{k}\cdot \mathcal{F}(\mathbf{u})_\mathbf{k}&=0\label{eq:incompressible-fourier}\\
 -\mu\left(\frac{2\pi}{L}\right)^2 |\mathbf{k}|^2 \mathcal{F}(\mathbf{u})_\mathbf{k} &= i\frac{2\pi}{L}\mathbf{k}\mathcal{F}(p)_\mathbf{k}-\mathcal{F}(\mathbf{f})_\mathbf{k}\label{eq:stokesequations-fourier}
 \end{align}
 By taking the dot product of \eqref{eq:stokesequations-fourier} and using \eqref{eq:incompressible-fourier} to eliminate $\mathcal{F}(\mathbf{u})_\mathbf{k}$, a solution for $\mathcal{F}(p)_\mathbf{k}$ is found.
-Substituting $\mathcal{F}(p)_\mathbf{k}$ in \eqref{eq:stokesequations-fourier} yields a solution for $\mathcal{F}(\mathbf{u})_\mathbf{k}$, $\mathbf{k}\neq\mathbf{0}$, in terms of $\mathcal{F}(\mathbf{f})_\mathbf{k}$. Finding $\mathbf{u}$ is then a matter of applying the inverse fourier transform.
+Substituting $\mathcal{F}(p)_\mathbf{k}$ in \eqref{eq:stokesequations-fourier} yields a solution for $\mathcal{F}(\mathbf{u})_\mathbf{k}$, $\mathbf{k}\neq\mathbf{0}$, in terms of $\mathcal{F}(\mathbf{f})_\mathbf{k}$. Finding $\mathbf{u}$ is then a matter of applying the inverse Fourier transform.
 \begin{align}
 \mathcal{F}(p)_\mathbf{k}&=-i\frac{\mathbf{k}\cdot \mathcal{F}(\mathbf{f})_\mathbf{k}}{|\mathbf{k}|^2 2\pi/L}\nonumber\\
 \mathcal{F}(\mathbf{u})_\mathbf{k}&=\frac{1}{\mu|\mathbf{k}|^2}\left(\frac{2\pi}{L}\right)^2 \left(\mathcal{F}(\mathbf{f})_\mathbf{k} - \mathbf{k} \frac{\mathbf{k}\cdot \mathcal{F}(\mathbf{f})_\mathbf{k}}{|\mathbf{k}|^2}\right)\label{eq:stokessolution-fourier}
 \end{align}
-and $\mathcal{F}(\mathbf{u})_\mathbf{0}:=0$. This can be expressed in real space as
+However, $\mathcal{F}(\mathbf{u})_\mathbf{0}$ is not defined here.
+This Fourier coefficient corresponds to the mean velocity of the fluid.
+It is undefined since the Stokes equations in \eqref{eq:incompressible} and \eqref{eq:stokesequations} only relate to the derivatives of $\mathbf{u}$.
+A common assignment of this value is $\mathcal{F}(\mathbf{u})_\mathbf{0}:=0$.
+This is expressed in real space as
 \begin{equation}
-\int_V \mathbf{u}(\mathbf{x})d\mathbf{x} = 0
+\int_V \mathbf{u}(\mathbf{x})d\mathbf{x} = 0.\label{eq:nonetflow}
 \end{equation}
 In physical terms: there is no net flow over the boundaries of the box.
 
@@ -127,31 +129,37 @@ In physical terms: there is no net flow over the boundaries of the box.
 The velocity field $\mathbf{u}$ in $[0,L)^3$ is represented by a set of values $\mathbf{u}_\mathbf{m}:=\mathbf{u}(h(\mathbf{m}-\mathbf{1}))$, for $\mathbf{m}\in I = \left\{(i,j,k) | i,j,k=1,2,...,N\right\}$, $h=L/N$ and $\mathbf{1}=(1,1,1)$.
 In other words the field $\mathbf{u}$ is described on a cubic $N\times N\times N$-grid by $\mathbf{u}_\mathbf{m}$, $\mathbf{m}\in I$.
 The forcing function is analogously represented by the values $\mathbf{f}_\mathbf{m}, \mathbf{m}\in I$.
-The Stokes flow is calculated directly from $\mathbf{f}_\mathbf{m}$ in \eqref{eq:stokessolution-fourier} using the fast fourier transform in Matlab.
-The 3D discrete fourier transform $\hat{f}_\mathbf{k}, \mathbf{k}\in I$ of a function representation $\mathbf{f}_\mathbf{m}, \mathbf{m}\in I$ is given by
+The Stokes flow is calculated directly from $\mathbf{f}_\mathbf{m}$ in \eqref{eq:stokessolution-fourier} using the fast Fourier transform (FFT) in Matlab.
+The 3D discrete Fourier transform $\hat{f}_\mathbf{k}, \mathbf{k}\in I$ of a function representation $\mathbf{f}_\mathbf{m}, \mathbf{m}\in I$ is given by
 \begin{equation}
-\hat{f}_\mathbf{k} = \sum_{\mathbf{m}\in I} f_\mathbf{m} e^{-i\frac{2\pi \cdot }{N} \mathbf{k}\cdot (\mathbf{m}-\mathbf{1})}\nonumber
+\hat{f}_\mathbf{k} = \sum_{\mathbf{m}\in I} f_\mathbf{m} e^{-i\frac{2\pi \cdot }{N} \mathbf{k}\cdot (\mathbf{m}-\mathbf{1})}.\nonumber
 \end{equation}
-The continuous fourier transform \eqref{eq:fourierdef} can be approximated using the discrete fourier transform,
-\begin{align}
-\mathcal{F}(f) &= \int_V f(\mathbf{x}) e^{-\frac{2\pi}{L}i(\mathbf{k}\cdot \mathbf{x})}d\mathbf{x}\nonumber\\
-	&\approx \sum_{\mathbf{m}\in I} f_\mathbf{m} e^{-i\frac{2\pi}{L}\mathbf{k}\cdot h(\mathbf{m}-\mathbf{1})} h^3\nonumber\\
-	&= h^3 \cdot \hat{f}_\mathbf{k}\nonumber
-\end{align}
-Given $\mathbf{f}_\mathbf{m}$ the discretized velocity field $\mathbf{u}_\mathbf{m}$ can be calculated from \eqref{eq:stokessolution-fourier} with the fast fourier transform.
-As the fast fourier transform has spectral convergence in $N$ the limiting factor for the convergence of solutions is the smoothness of the input, the forcing function $\mathbf{f}$.
+The continuous Fourier transform \eqref{eq:fourierdef} can be approximated using the discrete Fourier transform,
+\begin{equation}
+\mathcal{F}(f) = \int_V f(\mathbf{x}) e^{-\frac{2\pi}{L}i(\mathbf{k}\cdot \mathbf{x})}d\mathbf{x}
+\approx h^3 \sum_{\mathbf{m}\in I} f_\mathbf{m} e^{-i\frac{2\pi}{L}\mathbf{k}\cdot h(\mathbf{m}-\mathbf{1})}
+= h^3 \cdot \hat{f}_\mathbf{k}.\label{eq:fft-approx}
+\end{equation}
+Given $\mathbf{f}_\mathbf{m}$ the discretized velocity field $\mathbf{u}_\mathbf{m}$ can be calculated from \eqref{eq:stokessolution-fourier} with the FFT, yielding a solution to the discretized Stokes equations.\\
+The FFT can be seen in \eqref{eq:fft-approx} to approximate the Fourier transform by the trapezoidal rule for periodic functions, using the periodicity to eliminate one boundary term.
+This circumvents the comparatively low accuracy of the trapezoidal rule.\\
+This gives the FFT spectral convergence in $N$, given that the function being discretized is $C^\infty$. The accuracy of the solutions for $\mathbf{u}$ in \eqref{eq:stokessolution-fourier} is therefore depending on the smoothness of the input, the forcing function $\mathbf{f}$.
 
 % REGULARIZATION
 \subsection{Regularization\label{section:regularization}}
 The only contribution to the forcing function in this study is the force of gravity on the system of $M$ particles,
-\begin{align}
-\mathbf{f}(\mathbf{x}) &= -\rho g\hat{\mathbf{z}}\sum_{i=1}^M \delta (\mathbf{x}-\mathbf{x}_i)\label{eq:singularforcingfunction}\\
-&= -\rho g\hat{\mathbf{z}}\sum_{i=1}^M \delta^{r} (\mathbf{x}-\mathbf{x}_i)\nonumber
-\end{align}
+\begin{equation}
+\mathbf{f}(\mathbf{x}) = -\rho g\hat{\mathbf{z}}\sum_{i=1}^M \delta (\mathbf{x}-\mathbf{x}_i)\label{eq:singularforcingfunction}
+\approx -\rho g\hat{\mathbf{z}}\sum_{i=1}^M \delta^{r} (\mathbf{x}-\mathbf{x}_i)
+\end{equation}
 where $\rho$ is the relative density of the fluid and the particles, $g$ is the gravitational constant and $\hat{\mathbf{z}}=(0,0,1)$. $\mathbf{x}_i$ is the position of particle $i$, $i=1,2,...,M$.
 To evaluate the singular function in \eqref{eq:singularforcingfunction} on the grid an interpolating function $\delta^{r}$ is introduced in place of $\delta$.
-This process is called \emph{regularisation}.
-Two conditions are imposed on this regularisation funtion:
+This process is called \emph{regularization}.
+This is neccessary as directly evaluating a Dirac delta function on a discrete grid will almost always be identical to $0$.
+By introducing a well-chosen wider, continuous "delta-like" function the function behaves nicely on the grid as well, as can be seen in figure \ref{fig:regul-motiv}.
+
+\image{0.4}{regul-motiv}{Shows the result of evaluating a Dirac delta function and a delta-like function (lines) on a grid (asterisks). Except for in special cases, the result will come out as $0$ for the Dirac deltas while the continuous function will yield better results.}
+Three conditions are imposed on this \emph{regularization funtion}:
 \begin{enumerate}
 \item $\sum_{\mathbf{m}\in \mathbb{Z}^3}h^3\delta^{r}(h\mathbf{m}-\mathbf{x}_0) = 1$ for all $\mathbf{x}_0$. This is a discrete version of $\int \delta(\mathbf{x}) d\mathbf{x}=1$.
 \item $\delta^{r}$ should be as smooth as possible. The smoothness determines the convergence of solutions to \eqref{eq:stokessolution-fourier}.
@@ -164,9 +172,10 @@ These choices for $\delta^{r}$ are constructed from univariate functions, $\delt
 \subsubsection{Triangle functions}\label{section:triangle-delta}
 Perhaps the simplest choice of $\delta^{r}_{1}$ is
 \begin{equation}
-\delta^{r}_{1}(x) = \frac{1}{\epsilon}max\left(1-\frac{|x|}{\epsilon}\text{, }0\right)
+\delta^{r}_{1}(x) = \frac{1}{\epsilon}max\left(1-\frac{|x|}{\epsilon}\text{, }0\right),
 \end{equation}
 for some small $\epsilon$.
+This function is displayed in \ref{fig:triangledelta}.
 For $\epsilon=ph$, $p\in\mathbb{Z}^+$, this choice of $\delta^r$ does indeed satisfy the first condition.
 \begin{equation}
 \sum_{\mathbf{m}\in\mathbb{Z}^3}h^3\delta^{r}(h\mathbf{m}-\mathbf{x}_0)	= \sum_{i\in \mathbb{Z}}\sum_{j\in \mathbb{Z}}\sum_{k\in \mathbb{Z}}h\delta^{r}_1(hi-x_0)h\delta^{r}_1(hj-y_0)h\delta^{r}_1(hk-z_0)\label{eq:splitdelta3dto1d}
@@ -182,8 +191,8 @@ which by translation symmetry is equal to the cube of
 		&= 1\nonumber
 \end{align}
 The function is continuous but without a continuous derivative.
-Therefore the fourier coefficients of $\delta^r$ decrease as $k^{-1}$.
-\image{0.6}{triangledeltas}{Qualitative image of the triangle function choice of $\delta^{r}$.}
+Therefore the Fourier coefficients of $\delta^r$ decrease as $k^{-1}$.
+\image{0.6}{triangledelta}{Qualitative image of the triangle function choice of $\delta^{r}$.}
 
 % CARDINAL SPLINES
 \subsubsection{Cardinal splines}
@@ -197,7 +206,7 @@ $M_p$ is nonzero on $(0,p)$ and is shown in \cite{B-spline-paper} to satisfy the
 M_p(u) &= \frac{u}{p-1}M_{p-1}(u) + \frac{p-u}{p-1}M_{p-1}(u-1)\label{eq:spline-recursion}\\
 \frac{d}{du}M_p(u) &= M_{p-1}(u) - M_{p-1}(u-1)\label{eq:spline-derivative-recursion}
 \end{align}
-The regularisation function is
+The regularization function is
 \begin{equation}
 \delta^r_1(hi-x_0) = h^{-1}\cdot M_p(h^{-1}(hi-x_0)+\frac{p}{2})\nonumber
 \end{equation}
@@ -208,30 +217,37 @@ The resulting $\delta^r$ satisfies the first condition. It splits into a cube as
 \sum_{i\in \mathbb{Z}}h\delta^{r}_1(hi-x_0) &= \sum_{i\in \mathbb{Z}} h\cdot h^{-1} \cdot M_p(h^{-1}(hi-x_0)+\frac{p}{2})\nonumber\\
 		&= \sum_{i=0}^{p} M_p(i+\xi)\label{eq:B-spline-sum}
 \end{align}
-for some $\xi\in[0,1)$ because of translation symmetry and the compact support $[0,p]$ of $M_p$. $\sum_{i=\xi}{p+\xi}$ is taken to mean that $i$ is taken in increments of $1$. By using the recursion in \eqref{eq:spline-recursion} the expression in \eqref{eq:B-spline-sum} can be shown to be $1$ by induction.
+for some $\xi\in[0,1)$ because of translation symmetry and the compact support $[0,p]$ of $M_p$. $\sum_{i=\xi}^{p+\xi}$ is taken to mean that $i$ is taken in increments of $1$. By using the recursion in \eqref{eq:spline-recursion} the expression in \eqref{eq:B-spline-sum} can be shown to be $1$ by induction.
 $M_2$ is in fact a triangle function from section \ref{section:triangle-delta} and has already been proven to sum to $1$· Assuming \eqref{eq:B-spline-sum} equals $1$ for $p-1$ and any $\xi$,
 \begin{align}
 \sum_{i=\xi}^{p+\xi} M_p(i) &= \frac{1}{p-1}\sum_{i=\xi}^{p+\xi} iM_{p-1}(i) + (p-i)M_{p-1}(i-1)\nonumber\\
 		&= \sum_{i_1=\xi}^{p+\xi} M_{p-1}(i_1-1) + \frac{1}{p-1}\sum_{i_2=\xi}^{p+\xi} i_2M_{p-1}(i_2) - \frac{1}{p-1}\sum_{i_3=\xi}^{p+\xi} (i_3-1)M_{p-1}(i_3-1)\nonumber\\
 		&= \left\{ j_1 = i_1-1\text{, } j_2 = i_2\text{, }j_3 = i_3-1\right\}\nonumber\\
-		&= \sum_{j_1=\xi}^{(p-1)+\xi} M_{p-1}(j_1) + 0 + \frac{1}{p-1}\sum_{j_2=\xi}^{p+\xi} j_2M_{p-1}(j_2) + 0 - \sum_{j_3=\xi}^{p+\xi} j_3M_{p-1}(j_3) - 0\nonumber\\
+		&= \sum_{j_1=\xi}^{(p-1)+\xi} M_{p-1}(j_1) + \frac{1}{p-1}\sum_{j_2=\xi}^{p+\xi} j_2M_{p-1}(j_2) - \frac{1}{p-1}\sum_{j_3=\xi}^{p+\xi} j_3M_{p-1}(j_3)\nonumber\\
 		&= 1\nonumber
 \end{align}
+With the substitution some first and last terms of the sums are 0 and are removed.
+The final equality comes from the induction assumption for the first sum.
+The second and third sum are identical except for the sign, so they cancel, which proves the first condution.\\
 As $M_2$ is continuous it is easily deduced from \eqref{eq:spline-derivative-recursion} that $M_p$ is continuously differentiable $p-2$ times.
 \image{0.6}{splinedeltas}{Comparison of the first four even orders of cardinal B-splines, translated to be symmetric in the origin.}
 
-\subsection{Other simulation methods}
-To circumvent the problem of calculating the Stokes flow in the simulated region a method based on the Greens function can be used.
-The solution to the Stokes equations in \eqref{eq:stokesequations} in $\mathbb{R}^3$ for the choice $\mathbf{f}(\mathbf{x}) = \delta(\mathbf{x})$ is the Stokeslet,
+% STOKESLET
+\subsection{Another method of calculation}
+The particle velocities can be found directly without gridding by analytically solving the Stokes eqautions for the Dirac delta forcing functions in \eqref{eq:singularforcingfunction}. This method is explored in more detail in \cite{fallingclouds}.
+The resulting velocity of particle $i$ is
 \begin{equation}
-[Stokeslet]
+\dot{\mathbf{x}} = \mathbf{U}_0 + \rho g\hat{\mathbf{z}} \cdot \sum_{i\neq j} \mathbf{T}(\mathbf{x}_i-\mathbf{x}_j).\label{eq:stokesletsolution}
 \end{equation}
-which gives a solution for $\mathbf{u}$ in \eqref{eq:singularforcingfunction},
+where $\mathbf{U}_0$ is the mean velocity of the fluid and the terminal settling velocity of an isolated particle.
+As in \eqref{eq:nonetflow} it is common to eliminate this term by choosing the frame of reference moving with the velocity $\mathbf{U}_0$. $\mathbf{T}(\mathbf{r})$ is the Oseen-Burgers tensor,
 \begin{equation}
-[Solutionsum]
+\mathbf{T}(\mathbf{r})_{ij} = \frac{1}{8\pi \mu |\mathbf{r}|} \left( \delta_{ij} + \frac{\mathbf{r}_i \mathbf{r}_j}{|\mathbf{r}|^2}\right)\nonumber
 \end{equation}
-...and maybe some mention of Ewald summation or similar.
+in Einstein notation.\\
+The complexity issues with this approach relates to the number of particles $M$. The computational cost of calculating the sum in \eqref{eq:stokesletsolution} is $O(M^2)$.
 
+% SETUP AND ALGORITHMS
 \section{Setup and algorithms}
 
 \subsection{The scene}
@@ -265,27 +281,47 @@ The second, larger system has a cloud of $M~10^3$ particles uniformly distribute
 
 \section{Results}
 
-\subsection{Verifying some fundamental properties of the methods}
+% FEW PARTICLE PROPERTIES
+\subsection{Properties of the simulation method with few particles}
 
 \subsubsection{Convergence of the Stokes flow}
 The convergence of the solution obtained through \eqref{eq:stokessolution-fourier} depends on the smoothness of the forcing function $\mathbf{f}$.
-The convergence of solutions for a smooth and a non-smooth forcing function can be seen in figure \ref{fig:soln-conv/conv-cmp}.
-The smooth function is ($L=2.0$) $g_1(x,y,z) = sin(Lcos(\frac{2\pi}{L}x))cos(\frac{2\pi}{L}y) + sin(\frac{2\pi}{L}z)$ and the non-smooth is $g_2(x,y,z) = sin(\frac{2\pi}{L}x)cos(\frac{2\pi}{L}y)(\frac{2}{L^2}z^3 - \frac{3}{L} z^2 + z)$. $g_2$ is continuously differentiable once.
-The non-smooth solution converges as $N^{-2.29}$.
-\plot{soln-conv/conv-cmp}{Comparison of the Stokes flow solutions for a smooth and a non-smooth forcing function.}
+The convergence of solutions for a smooth and a non-smooth forcing function can be seen in figure \ref{fig:soln-conv/conv-cmp}, solved in a cube with $L=2.0$.
+The smooth function is $g_1$ and the non-smooth, once continuously differentiable function is $g_2$.
+\begin{align}
+g_1(x,y,z) &= \text{sin}(L\text{cos}(\frac{2\pi}{L}x))\text{cos}(\frac{2\pi}{L}y) + \text{sin}(\frac{2\pi}{L}z),\nonumber\\
+g_2(x,y,z) &= \text{sin}(\frac{2\pi}{L}x)\text{cos}(\frac{2\pi}{L}y)(\frac{2}{L^2}z^3 - \frac{3}{L} z^2 + z).\nonumber
+\end{align}
+The non-smooth solution converges as $N^{-2.06}$ while the smooth solution is clearly exponential.
+\plot{soln-conv/conv-cmp}{Convergence of the Stokes flow solutions for a smooth and a non-smooth forcing function.}
 
 \subsubsection{Characteristics of solutions for regularized singular forcing functions}
-Here the forcing function in \eqref{eq:singularforcingfunction} is introduced. The regularized forcing functions and respective solutions to Stokes equations for a system with $M=3$ particles along a central line along the $z$-axis is displayed in figure \ref{fig:regularization/regul-char-tmp}
-\plot{regularization/regul-char-tmp}{The particle positions, shape of the regularized point forces and Stokes flow for given particle positions. Here $L=2\pi$, $N=128$, $\epsilon=4h$.}
+Here the forcing function in \eqref{eq:singularforcingfunction} is introduced.
+A simple system consisting of a periodic cube of side length $L=2.0$ $m$. $M=3$ particles are placed along the central $z$-axis at heights $0.9$, $1.1$ and $1.2$ $m$. $N=256$.\\
+Using different regularization functions in the forcing function yields different solutions for $\mathbf{u}$.
+The particle positions and fluid velocity along the central $z$-axis are plotted for different regularization functions in figure \ref{fig:regularization/velocity-vary-regularization}. The same cross section of the forcing function is plotted in \ref{fig:regularization/force-vary-regularization}.
 
-\subsubsection{Convergence for regularization scaling with the grid}
-%\subsubsection{Moments of the regularized delta functions}
-\subsubsection{Fourier Convergence results}
+\plot{regularization/triangle-diffsupp-force}{The forcing function evaluated on the central $z$-axis for different widths of triangle functions.}
+\plot{regularization/spline-diffsupp-force}{The forcing function evaluated on the central $z$-axis for different orders of Cardinal B-Spline forcing functions}
+\plot{regularization/spline-difforder-force}{The forcing function evaluated on the central $z$-axis for different orders of Cardinal B-Spline forcing functions, keeping the support fixed.}
+\plot{regularization/triangle-diffsupp-velocity}{The $u_3$-component of $\mathbf{u}$ along the central $z$-axis for different widths of triangle functions.}
+\plot{regularization/spline-diffsupp-velocity}{The $u_3$-component of $\mathbf{u}$ along the central $z$-axis for different orders of Cardinal B-Spline forcing functions, keeping the support proportional to the order.}
+\plot{regularization/spline-difforder-velocity}{The $u_3$-component of $\mathbf{u}$ along the central $z$-axis for different orders of Cardinal B-Spline forcing functions, keeping the support fixed.}
+% BELOW IS OLD
+The $\delta^r$ most resembling a Dirac delta is the B-spline for $p=2$, it has the narrowest support.
+This is reflected in the Stokes flow solution, the velocity clearly spikes at the particle position.
+With increasing order - i.e. wider support - the Stokes flow for B-splines approach the wide triangle functions.
+The $\delta^r$s for $p=8$ and $\epsilon=8h$ have the same support and their solutions are very similar.
+For the triangle function it has a higher velocity in the immediate vicinity of the particle, mirroring that the forcing function spikes in comparison to the flat forcing function for the B-spline.\\
+The narrow regularization functions resemble the non-regularized Stokes flow solution, with singularities in particle positions.
+The wider functions yield a more spread out solution, implying these "smeared" particles affect fluid and particles further away.
+However, all Stokes flows are indistinguishable in the plots only a short distance from the 3-particle cluster.
+
+\subsubsection{Convergence of the triangular forcing functions as $N$ increases}
+% BELOW IS OLD
 \plot{eps-conv/varying_deltas_2norms_small}{Normed successive differences in solutions as N increases and epsilon decreasing with it.}
 \plot{eps-conv/fixed_deltas_2norms_small}{Normed successive differences in solutions as N increases, keeping epsilon fixed.}
 
-\subsection{Comparing the solutions with other known methods}
-The system studied in this article is not the same system initially presented. The system uses discretized functions and an assumption of  periodicity has been made. It is thus of interest to study how this simulation method compares to other takes on the particle system.
 \subsubsection{Scaling the primitive periodic cell}\label{cellscale}
 If the cloud of particles is of the same magnitude as the period of the system it is not unlikely to have interactions between clouds of different primitive cells.
 This can be studied by scaling the length of the primitive cells while keeping the particle cloud size fixed and looking at the differences between successive solutions for the velocity field in a cube of fixed size containing the particle cloud.
@@ -294,23 +330,32 @@ However, the meaning of this measure in not entirely obvious.
 For each value of $L$ a different physical system is studied. The solutions for these systems should converge to the non-periodic case as $L\rightarrow \infty$.
 \plot{len-conv/lengthvary_small}{Normed successive differences in solutions as the primitive cell increases.}
 
+% MACRO
 \subsection{Macroscopic phenomena}
-The evolution of the cloud shape in a periodic box appears to agree with that observed by Metzger et al \cite{fallingclouds} in a non-periodic setting.
-The sedimenting ball becomes oblate, forms a torus (see Figure \ref{fig:macro/torus-qualitative}) and eventually breaks into two smaller clouds.
-This can be compared in more detail by studying e.g. the particle density along the z-axis in the cloud center, the pressure gradient in and surrounding the cloud, the velocity field in and around the cloud.\\
-\plot{macro/torus-qualitative}{The torus shape the cloud evolves into [plot missing axes, units, \#steps, dt=0.01, N=32, M=1000 etc]\label{fig:torusplot}}
+The evolution of the cloud shape in a periodic box appears to agree to some extent with that observed by Metzger et al \cite{fallingclouds} in a non-periodic setting.
+A simulation was run with $M=1000$ particles randomly uniformly scattered inside a ball of radius $0.5$ where $L=2\pi$ and simulated with a mesh size of $N=64$ and $dt=0.01$. 
+The sedimenting particle cloud becomes oblate, forms a torus and eventually breaks into two smaller clouds, as can be seen in Figure \ref{fig:seq/cloud-time-evolution} and \ref{fig:seq/split-qualitative-bw}.
 
+\image{0.3}{seq/cloud-time-evolution}{Some frames characterizing the stages the particle cloud undergoes as it sediments. The color indicates qualitatively the fluid speed in a cross section at $x=0.5L$. The time frames are read from left to right, top row first.}
+\image{0.6}{seq/split-qualitative-bw}{A different angle of the simulation in figure \ref{fig:seq/cloud-time-evolution} from a different angle and slightly later time. Note the split into two different particle clouds, as well as the trailing tail of particles leaving the cloud.}
+% BELOW IS OLD
 For too few gridpoints the cloud appears to take a square shape aligned with the grid cells, see Figure \ref{fig:macro/torus-square}. When this effect in practice disappears can be studied further, e.g. by plotting the particle density as a function of azimuthal angle.
 \plot{macro/torus-square}{The square shape of the torus cloud for N=8 [plot missing axes, units, \#steps, dt=0.001, N=8, M=1000 etc]}
 
-\section{Discussion}
-
 \section{Conclusions}
-
+The choice of regularization function directly influences the solutions for the Stokes equations.
+Wider choices of $\delta^r$ do not mirror the behaviour of the analytical, non-regularized solution, at least not locally.
+They might be more suitable for simulating particles with a less defined radius.
+On the other hand, to choose narrower functions means either less accurate solutions or a finer calculation grid.\\
+By comparing this method to exact solutions for spherical particles one could try to find at what support size - what \emph{efficient radius} - would behave most like the spherical particle solutions.\\
+The convergence in $N$ of Stokes flow solutions for different splines was not investigated enough for inclusion in this thesis, and would be a logical next step after the triangle functions in examining these different $\delta^r$.\\
+To eliminate all unwanted properties of the periodicity and regularization in the larger simulation requires a large $N$, which might push the computations into a less feasibly computed range.\\
+However, the grid only needs to be finer by the particle - in and near the support of the regularized delta functions.
+One way of handling this could be by using some non-uniform gridding method and the non-uniform FFT.\\
+For larger systems this method seems to capture at least some properties of the behaviour non-periodic non-regularized system, unless $N$ is taken to be too small. By running comparisons with similar methods, e.g. by looking at statistical measures of the particle cloud, one could explain more of the behaviour of this system and what makes it behave differently the way it does.\\
+There are three ways in which this system deviates from the original physical system of particles in free space. It has been discretized, periodic and point particles have been replaced by regularized delta functions. All of these steps takes us further away from the physical system and introduces new proprties of the system, and careful studies are needed.
 
 \bibliography{bibliography}
 \bibliographystyle{plain}
 
-\section{Appendices}
-\subsection{Appendix A: Assuming periodicity}
 \end{document}
