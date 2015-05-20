@@ -83,7 +83,7 @@ function [varyVals, error] = ShowConvergence(N0, imax, L, g)
     grid on;
     set(gca,'FontSize',fontsize);
     ylabel('relative 2-norm error in velocity')
-    xlabel('Grid size N');
+    xlabel('Grid resolution N');
     title('convergence of solution for smooth forcing function')
 
     %axis([10^.75 10^2.25 10^(-17) 10^3])
