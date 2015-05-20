@@ -306,11 +306,11 @@ Using different regularization functions in the forcing function yields differen
 The particle positions and fluid velocity along the central $z$-axis are plotted for different regularization functions in figure \ref{fig:regularization/velocity-vary-regularization}. The same cross section of the forcing function is plotted in \ref{fig:regularization/force-vary-regularization}.
 
 \plot{regularization/triangle-diffsupp-force}{The forcing function evaluated on the central $z$-axis for different widths of triangle functions.}
-\plot{regularization/spline-diffsupp-force}{The forcing function evaluated on the central $z$-axis for different orders of Cardinal B-Spline forcing functions}
 \plot{regularization/spline-difforder-force}{The forcing function evaluated on the central $z$-axis for different orders of Cardinal B-Spline forcing functions, keeping the support fixed.}
 \plot{regularization/triangle-diffsupp-velocity}{The $u_3$-component of $\mathbf{u}$ along the central $z$-axis for different widths of triangle functions.}
-\plot{regularization/spline-diffsupp-velocity}{The $u_3$-component of $\mathbf{u}$ along the central $z$-axis for different orders of Cardinal B-Spline forcing functions, keeping the support proportional to the order.}
 \plot{regularization/spline-difforder-velocity}{The $u_3$-component of $\mathbf{u}$ along the central $z$-axis for different orders of Cardinal B-Spline forcing functions, keeping the support fixed.}
+\plot{soln-conv/conv-splines}{Convergence of the Stokes flow solutions for the three particles with different choices of regularization. $N=128$.}
+
 % BELOW IS OLD
 The $\delta^r$ most resembling a Dirac delta is the B-spline for $p=2$, it has the narrowest support.
 This is reflected in the Stokes flow solution, the velocity clearly spikes at the particle position.
