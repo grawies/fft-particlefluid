@@ -228,9 +228,9 @@ $M_2$ is in fact a triangle function from section \ref{section:triangle-delta} a
 		&= \sum_{i_1=\xi}^{p+\xi} M_{p-1}(i_1-1) + \frac{1}{p-1}\sum_{i_2=\xi}^{p+\xi} i_2M_{p-1}(i_2) - \frac{1}{p-1}\sum_{i_3=\xi}^{p+\xi} (i_3-1)M_{p-1}(i_3-1)\nonumber\\
 		&= \left\{ j_1 = i_1-1\text{, } j_2 = i_2\text{, }j_3 = i_3-1\right\}\nonumber\\
 		&= \sum_{j_1=\xi}^{(p-1)+\xi} M_{p-1}(j_1) + \frac{1}{p-1}\sum_{j_2=\xi}^{p+\xi} j_2M_{p-1}(j_2) - \frac{1}{p-1}\sum_{j_3=\xi}^{p+\xi} j_3M_{p-1}(j_3)\nonumber\\
-		&= 1\nonumber
+		&= 1.\nonumber
 \end{align}
-With the substitution some first and last terms of the sums are 0 and are removed.
+With the substitution, some first and last terms of the sums are 0 and are removed.
 The final equality comes from the induction assumption for the first sum.
 The second and third sum are identical except for the sign, so they cancel, which proves the first condution.\\
 As $M_2$ is continuous it is easily deduced from \eqref{eq:spline-derivative-recursion} that $M_p$ is continuously differentiable $p-2$ times.
@@ -280,6 +280,7 @@ If the only interest is studying the velocity field solution on the grid, steps 
 \subsection{The particle cloud setup used here}
 
 Two systems of particles are studied in this article.
+One 
 The first and simplest systems has $M=3$ particles placed along a central $z$-axis in the primitive cell, two clustered to display the increase in velocity as they drag more fluid together.
 The second, larger system has a cloud of $M~10^3$ particles uniformly distributed over a ball, initially in the center of the primitive cell. This is similar to the system studied in \cite{fallingclouds}.
 
@@ -299,27 +300,38 @@ g_2(x,y,z) &= \text{sin}(\frac{2\pi}{L}x)\text{cos}(\frac{2\pi}{L}y)(\frac{2}{L^
 The non-smooth solution converges as $N^{-2.06}$ while the smooth solution is clearly exponential.
 \plot{soln-conv/conv-cmp}{Convergence of the Stokes flow solutions for a smooth and a non-smooth forcing function.}
 
+% SOLUTION CHARACTERISTICS FOR DIFFERENT REGULARIZATIONS
 \subsubsection{Characteristics of solutions for regularized singular forcing functions}
-Here the forcing function in \eqref{eq:singularforcingfunction} is introduced.
+Here the forcing function in equation \eqref{eq:singularforcingfunction} is introduced.
 A simple system consisting of a periodic cube of side length $L=2.0$ $m$. $M=3$ particles are placed along the central $z$-axis at heights $0.9$, $1.1$ and $1.2$ $m$. $N=256$.\\
 Using different regularization functions in the forcing function yields different solutions for $\mathbf{u}$.
-The particle positions and fluid velocity along the central $z$-axis are plotted for different regularization functions in figure \ref{fig:regularization/velocity-vary-regularization}. The same cross section of the forcing function is plotted in \ref{fig:regularization/force-vary-regularization}.
-
+The particle positions and forcing functions along the central $z$-axis are plotted for different choices of regularization function in figures \ref{fig:regularization/triangle-diffsupp-force} and \ref{fig:regularization/spline-difforder-force}.
+The solved Stokes flow along the same axis are plotted in figures \ref{fig:regularization/triangle-diffsupp-velocity} and \ref{fig:regularization/spline-difforder-velocity}.\\
+Note that while the delta functions appear to have different area, they still sum to 1.
+A function with narrower support is not as spread out in the $x$- and $y$-direction and appears larger in the plots.
+% SHAPE PLOTS
 \plot{regularization/triangle-diffsupp-force}{The forcing function evaluated on the central $z$-axis for different widths of triangle functions.}
-\plot{regularization/spline-difforder-force}{The forcing function evaluated on the central $z$-axis for different orders of Cardinal B-Spline forcing functions, keeping the support fixed.}
 \plot{regularization/triangle-diffsupp-velocity}{The $u_3$-component of $\mathbf{u}$ along the central $z$-axis for different widths of triangle functions.}
+\plot{regularization/spline-difforder-force}{The forcing function evaluated on the central $z$-axis for different orders of Cardinal B-Spline forcing functions, keeping the support fixed.}
 \plot{regularization/spline-difforder-velocity}{The $u_3$-component of $\mathbf{u}$ along the central $z$-axis for different orders of Cardinal B-Spline forcing functions, keeping the support fixed.}
-\plot{soln-conv/conv-splines}{Convergence of the Stokes flow solutions for the three particles with different choices of regularization. $N=128$.}
-
-% BELOW IS OLD
-The $\delta^r$ most resembling a Dirac delta is the B-spline for $p=2$, it has the narrowest support.
-This is reflected in the Stokes flow solution, the velocity clearly spikes at the particle position.
-With increasing order - i.e. wider support - the Stokes flow for B-splines approach the wide triangle functions.
-The $\delta^r$s for $p=8$ and $\epsilon=8h$ have the same support and their solutions are very similar.
-For the triangle function it has a higher velocity in the immediate vicinity of the particle, mirroring that the forcing function spikes in comparison to the flat forcing function for the B-spline.\\
+% DISCUSS SHAPES
+In the velocity plots, figures \ref{fig:regularization/triangle-diffsupp-velocity} and \ref{fig:regularization/spline-difforder-velocity}, the forcing functions with narrower support appear more like delta functions, explaining that the Stokes flow has sharper and higher velocity peaks near the particle position.\\
 The narrow regularization functions resemble the non-regularized Stokes flow solution, with singularities in particle positions.
 The wider functions yield a more spread out solution, implying these "smeared" particles affect fluid and particles further away.
-However, all Stokes flows are indistinguishable in the plots only a short distance from the 3-particle cluster.
+However, the Stokes flows are indistinguishable in the plots only a short distance from the 3-particle cluster.\\
+This is observed regardless of whether it is the scale that is increaed - figure \ref{fig:regularization/triangle-diffsupp-velocity} - or the spline order while keeping the support fixed - figure \ref{fig:regularization/spline-difforder-velocity}. This implies that if a triangular regularized delta function with wide support is used, a similar solution behaviour might be obtained with a higher order B-spline and smaller support.
+% CONVERGENCE PLOT
+\plot{soln-conv/conv-splines}{Convergence of the Stokes flow solutions for the three particles with different choices of regularization, where $N=16n$, $n=1,2,...,11$.}
+% DISCUSS CONVERGENCE
+Figure \ref{fig:soln-conv/conv-splines} shows the convergence of different orders of B-splines.
+Each relative error is calculated from two Stokes flow solutions $\mathbf{u}^{nN_0}$ and $\mathbf{u}^{(n+1)N_0}$ for given integers $N_0=16$ and $n=1,2,...,11$ and a fixed spline order.
+\begin{equation}
+y(nN_0) = \frac{\|\mathbf{v}^{(n+1)N_0}-\mathbf{v}^{nN_0}\|_2}{\|\mathbf{v}^{nN_0}\|_2},
+\end{equation}
+where $\mathbf{v}^{nN_0}$ contains the elements $\mathbf{u}^{nN_0}_{kn}$, $k=1,2,...,N_0$ to compare vectors of different length. $N$ is taken to be $nN_0$.\\
+The solutions clearly converge as $N$ increases.
+Higher order splines yields faster convergence.
+If higher accuracy is required, increasing the spline order could be a good way of achieving it if the application allows for the wider support that comes with higher spline order.
 
 \subsubsection{Convergence of the triangular forcing functions as $N$ increases}
 % BELOW IS OLD
@@ -327,11 +339,11 @@ However, all Stokes flows are indistinguishable in the plots only a short distan
 \plot{eps-conv/fixed_deltas_2norms_small}{Normed successive differences in solutions as N increases, keeping epsilon fixed.}
 
 \subsubsection{Scaling the primitive periodic cell}\label{cellscale}
-If the cloud of particles is of the same magnitude as the period of the system it is not unlikely to have interactions between clouds of different primitive cells.
-This can be studied by scaling the length of the primitive cells while keeping the particle cloud size fixed and looking at the differences between successive solutions for the velocity field in a cube of fixed size containing the particle cloud.
+If the cloud of particles is of the same magnitude as the period $L$ of the system it is not unlikely to have interactions between clouds of different primitive cells.
+The effect of this is be studied by scaling the length of the primitive cells while keeping the particle cloud size fixed and looking at the differences between successive solutions for the velocity field in a cube of fixed size containing the particle cloud.
+The result is displayed in figure \ref{fig:len-conv/lengthvary_small}.
 For simple triangle functions, the successive relative differences decrease as $L^{-1.30}$.
-However, the meaning of this measure in not entirely obvious.
-For each value of $L$ a different physical system is studied. The solutions for these systems should converge to the non-periodic case as $L\rightarrow \infty$.
+While the meaning of this measure in not entirely obvious, since for each value of $L$ a different physical system is studied, the solutions for these systems should converge to the non-periodic case as $L\rightarrow \infty$.
 \plot{len-conv/lengthvary_small}{Normed successive differences in solutions as the primitive cell increases.}
 
 % MACRO
