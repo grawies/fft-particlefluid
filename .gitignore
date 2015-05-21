@@ -17,7 +17,7 @@ logs/*
 *.out
 *.toc
 report/*.pdf
-
+report/summary/*.pdf
 
 *~
 
