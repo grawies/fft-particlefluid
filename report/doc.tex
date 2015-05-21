@@ -179,8 +179,8 @@ Three properties are expected of this \emph{regularization funtion}:
 \end{enumerate}
 Condition (i) ensures that the total force is preserved, and is an exact requirement.
 Condition (ii) ensures that the accuracy increases sufficiently fast with $N$.
-A function in $C^q$ has fourier coefficients that decrease as $O(N^{-q})$.
-With the factor $\frac{1}{|\mathbf{k}|^2}$ in \eqref{eq:stokessolution-fourier}, the error should decrease as $O(N^{-(q+2)})$.\\
+With a forcing function $\mathbf{f}$ in $C^q$ has fourier coefficients that decrease as $O(|\mathbf{k}|^{-(q+1)})$ when $N$ increases.
+With the factor $\frac{1}{|\mathbf{k}|^2}$ in \eqref{eq:stokessolution-fourier}, the coefficients of $\mathbf{u}$ should decrease as $O(|\mathbf{k}|^{-(q+3)})$, in real space $O(N^{-(q+3)})$.\\
 Condition (iii) makes evaluating each delta function on the grid cheaper. Instead of $N^3$ calculations it is enough with $\left(\frac{\epsilon}{h}\right)^3$ if the support is a cube of side length $\epsilon$.\\
 There is a tradeoff between condition (ii) and condition (iii), as higher smoothness usually comes with a wider support.\\
 Two choices of regularization functions with are studied in this report, mainly based on the methods in \cite{spectralewald} and \cite{interfaceregularization}.
@@ -248,7 +248,7 @@ $M_2$ is in fact a triangle function from section \ref{section:triangle-delta} a
 With the substitution, some first and last terms of the sums are 0 and are removed.
 The final equality comes from the induction assumption for the first sum.
 The second and third sum are identical except for the sign, so they cancel, which proves the function satisfies condition (i).\\
-For condition (ii), as $M_2$ is continuous it is easily deduced from \eqref{eq:spline-derivative-recursion} that $M_p$ is continuously differentiable $p-2$ times.
+For condition (ii), as $M_2$ is continuous it is easily deduced from \eqref{eq:spline-derivative-recursion} that $M_p$ is continuously differentiable $p-2$ times. The fourier coefficients are thus expected to decrease as $N^{-(p-1)}$.
 \image{0.6}{splinedeltas}{Comparison of the first four even orders of cardinal B-splines, translated to be symmetric in the origin.}
 
 % STOKESLET
@@ -313,17 +313,17 @@ The second, larger system has a cloud of $M\propto 10^3$ particles uniformly dis
 \subsubsection{Convergence of the Stokes flow}
 The convergence of the solution obtained through \eqref{eq:stokessolution-fourier} depends on the smoothness of the forcing function $\mathbf{f}$.
 The convergence of solutions for a smooth and a non-smooth forcing function can be seen in figure \ref{fig:soln-conv/conv-cmp}, solved in a cube with $L=2.0$.
-The smooth function is $g_1$ and the non-smooth, once continuously differentiable function is $g_2$.
+The smooth function is $g_1$ and the non-smooth $C^0$ function is $g_2$.
 \begin{align}
 g_1(x,y,z) &= \text{sin}(L\text{cos}(\frac{2\pi}{L}x))\text{cos}(\frac{2\pi}{L}y) + \text{sin}(\frac{2\pi}{L}z),\nonumber\\
-g_2(x,y,z) &= \text{sin}(\frac{2\pi}{L}x)\text{cos}(\frac{2\pi}{L}y)(\frac{2}{L^2}z^3 - \frac{3}{L} z^2 + z).\nonumber
+g_2(x,y,z) &= \text{sin}(\frac{2\pi}{L}x)\text{cos}(\frac{2\pi}{L}y)\cdot z(z-L)\nonumber%(\frac{2}{L^2}z^3 - \frac{3}{L} z^2 + z).\nonumber
 \end{align}
-The non-smooth solution converges as $N^{-2.06}$ while the smooth solution is clearly exponential.
-As the non-smooth solution is once continuously 
+The non-smooth solution converges as $N^{-3.09}$ while the smooth solution is clearly exponential.\\ % 3.08 for z(z-L)
+$g_2$ is $C^0$ and is from the theory in section \ref{section:regularization} expected to decrease as $N^-3$, as expected with a $C^0$ forcing function.
 \plot{soln-conv/conv-cmp}{Convergence of the Stokes flow solutions for a smooth and a non-smooth forcing function.}
 
 % SOLUTION CHARACTERISTICS FOR DIFFERENT REGULARIZATIONS
-\subsubsection{Characteristics of solutions for regularized singular forcing functions}
+\subsubsection{Characteristics of solutions for regularized singular forcing functions}\label{section:regul-results}
 Here the forcing function in equation \eqref{eq:singularforcingfunction} is introduced.
 A simple system consisting of a periodic cube of side length $L=2.0$ $m$. $M=3$ particles are placed along the central $z$-axis at heights $0.9$, $1.1$ and $1.2$ $m$. $N=256$.\\
 Using different regularization functions in the forcing function yields different solutions for $\mathbf{u}$.
@@ -340,10 +340,11 @@ A function with narrower support is not as spread out in the $x$- and $y$-direct
 In the velocity plots, figures \ref{fig:regularization/triangle-diffsupp-velocity} and \ref{fig:regularization/spline-difforder-velocity}, the forcing functions with narrower support appear more like delta functions, explaining that the Stokes flow has sharper and higher velocity peaks near the particle position.\\
 The narrow regularization functions resemble the non-regularized Stokes flow solution, with singularities in particle positions.
 The wider functions yield a more spread out solution, implying these "smeared" particles affect fluid and particles further away.
-However, the Stokes flows are indistinguishable in the plots only a short distance from the 3-particle cluster.\\
+However, the Stokes flows are indistinguishable in the plots only a short distance away in $z$-direction from the 3-particle cluster.\\
 This is observed regardless of whether it is the scale that is increaed - figure \ref{fig:regularization/triangle-diffsupp-velocity} - or the spline order while keeping the support fixed - figure \ref{fig:regularization/spline-difforder-velocity}. This implies that if a triangular regularized delta function with wide support is used, a similar solution behaviour might be obtained with a higher order B-spline and smaller support.
 % CONVERGENCE PLOT
 \plot{soln-conv/conv-splines}{Convergence of the Stokes flow solutions for the three particles with different choices of regularization, where $N=16n$, $n=1,2,...,11$.}
+\plot{soln-conv/conv-order-plot}{The measured convergence plotted over the cardinal B-spline orders, with an estimate line and the expected convergence.}
 % DISCUSS CONVERGENCE
 Figure \ref{fig:soln-conv/conv-splines} shows the convergence of different orders of B-splines.
 Each relative error is calculated from two Stokes flow solutions $\mathbf{u}^{nN_0}$ and $\mathbf{u}^{(n+1)N_0}$ for given integers $N_0=16$ and $n=1,2,...,11$ and a fixed spline order.
@@ -351,8 +352,10 @@ Each relative error is calculated from two Stokes flow solutions $\mathbf{u}^{nN
 y(nN_0) = \frac{\|\mathbf{v}^{(n+1)N_0}-\mathbf{v}^{nN_0}\|_2}{\|\mathbf{v}^{nN_0}\|_2},
 \end{equation}
 where $\mathbf{v}^{nN_0}$ contains the elements $\mathbf{u}^{nN_0}_{kn}$, $k=1,2,...,N_0$ to compare vectors of different length. $N$ is taken to be $nN_0$.\\
-The solutions clearly converge as $N$ increases.
-Higher order splines yields faster convergence.
+The solutions clearly converge as $N$ increases, with higher order splines yielding faster convergence.\\
+The B-splines are expected to converge as $N^{-(p+1)}$.
+The exponents of convergence in the legend of figure \ref{fig:soln-conv/conv-splines} are plotted over spline order in figure \ref{fig:soln-conv/conv-order-plot}.
+While the convergence is not as expected, it appears linear in $p$ and does not take off too far from the expected convergence.\\
 If higher accuracy is required, increasing the spline order could be a good way of achieving it if the application allows for the wider support that comes with higher spline order.
 % L-SCALING
 \subsubsection{Scaling the primitive periodic cell}\label{cellscale}
@@ -383,7 +386,7 @@ Wider choices of $\delta^r$ do not mirror the behaviour of the analytical, non-r
 They might be more suitable for simulating particles with a less defined radius.
 On the other hand, to choose narrower functions means either less accurate solutions or a finer calculation grid.\\
 By comparing this method to exact solutions for spherical particles one could try to find at what support size - what \emph{efficient radius} - would behave most like the spherical particle solutions.\\
-The convergence in $N$ of Stokes flow solutions for different splines was not investigated enough for inclusion in this thesis, and would be a logical next step after the triangle functions in examining these different $\delta^r$.\\
+The convergence in $N$ of Stokes flow solutions for different splines was not investigated enough for saying anything conclusive in this thesis, although they appear to behave nearly as expected. Whether it is a fault in implementation or the author's theoretical knowledge is unknown.\\
 To eliminate all unwanted properties of the periodicity and regularization in the larger simulation requires a large $N$, which might push the computations into a less feasibly computed range.\\
 However, the grid only needs to be finer by the particle - in and near the support of the regularized delta functions.
 One way of handling this could be by using some non-uniform gridding method and the non-uniform FFT.\\
