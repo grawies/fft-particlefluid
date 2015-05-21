@@ -22,7 +22,7 @@ function [varyVals, error] = ShowConvergence(N0, imax, L, g)
     %% DATA COLLECTION
     for i = 1:imax
         
-        N = NVals(i);
+        N = NVals(i)
         
         I = 1:N/N0:N;
         
