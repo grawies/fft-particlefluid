@@ -178,9 +178,12 @@ Three properties are expected of this \emph{regularization funtion}:
 \item $\delta^{r}$ should have a small, compact support. This allows for relatively cheap calculation of the forcing function in real space.
 \end{enumerate}
 Condition (i) ensures that the total force is preserved, and is an exact requirement.
-Condution (ii) and (iii) are less precise, but are there to ensure a fast method.
-There is a tradeoff here, as higher smoothness usually comes with a wider support.\\
-Two such choices of regularization functions are discussed in this report, mainly based on the methods in \cite{spectralewald} and \cite{interfaceregularization}.
+Condition (ii) ensures that the accuracy increases sufficiently fast with $N$.
+A function in $C^q$ has fourier coefficients that decrease as $O(N^{-q})$.
+With the factor $\frac{1}{|\mathbf{k}|^2}$ in \eqref{eq:stokessolution-fourier}, the error should decrease as $O(N^{-(q+2)})$.\\
+Condition (iii) makes evaluating each delta function on the grid cheaper. Instead of $N^3$ calculations it is enough with $\left(\frac{\epsilon}{h}\right)^3$ if the support is a cube of side length $\epsilon$.\\
+There is a tradeoff between condition (ii) and condition (iii), as higher smoothness usually comes with a wider support.\\
+Two choices of regularization functions with are studied in this report, mainly based on the methods in \cite{spectralewald} and \cite{interfaceregularization}.
 These choices for $\delta^{r}$ are constructed from univariate functions, $\delta^{r}(\mathbf{x}) = \delta^{r}_{1}(x) \delta^{r}_{1}(y) \delta^{r}_{1}(z)$.
 
 % TRIANGLE FUNCTIONS
@@ -316,6 +319,7 @@ g_1(x,y,z) &= \text{sin}(L\text{cos}(\frac{2\pi}{L}x))\text{cos}(\frac{2\pi}{L}y
 g_2(x,y,z) &= \text{sin}(\frac{2\pi}{L}x)\text{cos}(\frac{2\pi}{L}y)(\frac{2}{L^2}z^3 - \frac{3}{L} z^2 + z).\nonumber
 \end{align}
 The non-smooth solution converges as $N^{-2.06}$ while the smooth solution is clearly exponential.
+As the non-smooth solution is once continuously 
 \plot{soln-conv/conv-cmp}{Convergence of the Stokes flow solutions for a smooth and a non-smooth forcing function.}
 
 % SOLUTION CHARACTERISTICS FOR DIFFERENT REGULARIZATIONS
@@ -366,7 +370,7 @@ A simulation was run with $M=1000$ particles randomly uniformly scattered inside
 As in \cite{fallingclouds} the sedimenting particle cloud becomes oblate, forms a torus and eventually breaks into two smaller clouds, as can be seen in figure \ref{fig:seq/cloud-time-evolution} and \ref{fig:seq/split-qualitative-bw}.
 
 \image{0.3}{seq/cloud-time-evolution}{Some frames characterizing the stages the particle cloud undergoes as it sediments. The color indicates qualitatively the fluid speed in a cross section at $x=0.5L$. Only particles with higher $x$-values than the cross section are drawn. The frames are read from left to right, top row first.}
-\image{0.6}{seq/split-qualitative-bw}{A different angle of the simulation in figure \ref{fig:seq/cloud-time-evolution} from a different angle and slightly later time. Note the split into two different particle clouds, as well as the trailing tail of particles leaving the cloud.}
+\image{0.6}{seq/split-qualitative-bw}{A different angle of the simulation in figure \ref{fig:seq/cloud-time-evolution} from a different angle and slightly later time. Note the split into two different particle clouds, as well as the tail of particles leaving the cloud.}
 % LOW-REZ
 \subsection{Simulating many particles with low grid resolution}
 For too few gridpoints the cloud appears to take a square shape aligned with the grid cells, see figure \ref{fig:macro/torus-square}. The timestep $dt=0.001$, $N=8$, $M=1000$.
