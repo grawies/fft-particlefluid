@@ -42,7 +42,7 @@ function [error, varyVals, velnorm] = CompareInitialFlows(varyParam, iterations,
             epsilon = 2*pi/16;
         end
         
-        [u,v,w] = CalcInitialFlow(L,N,epsilon, deltaType,p);
+        [u,v,w] = CalcInitialFlow(L,N,deltaType,[p(1)*i,p(2)]);
         if strcmp(varyParam,'N')
             utmp = u(I,I,I);
             vtmp = v(I,I,I);
@@ -117,7 +117,7 @@ function [error, varyVals, velnorm] = CompareInitialFlows(varyParam, iterations,
         end
     end
     if varyParam == 'L'
-        xlabel('Grid size L');
+        xlabel('Cube side length L');
         title('Convergence of velocity field solution');
     end
     
