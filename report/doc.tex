@@ -266,35 +266,39 @@ The complexity issues with this approach relates to the number of particles $M$.
 % SETUP AND ALGORITHMS
 \section{Setup and algorithms}
 
-\subsection{The scene}
-The system in question is a cloud of $M$ particles randomly placed within a sphere of radius $r_0$. This sphere begins in the center of a primitive cell, a cube of side length $L$, which is periodically repeated throughout space.\\
-The particles are affected by a gravitational force downward and a lift from the fluid. The resulting force on the particles is the sole driving force in the simulation.\\
-The force from the particles on the fluid make up the forcing function in Stokes' equation.
+\subsection{The model}
+Two systems of particles are studied here.
+In both systems, $M$ pointlike particles are distributed in a cube of fluid with side length $L$.
+This cube is repeated periodically in three dimensions.
+The only force on this system is the gravitational force on the particles.
+The difference between the two systems are in the value of $M$ and the particles' initial velocities.
 
 \subsection{The four-step simulation}
 \image{0.35}{solver-principle-transparent}{The simulation algorithm steps\label{fig:simprinciple}}
 Each timestep the simulation has four distinct moments, as illustrated in figure \ref{fig:simprinciple}.
 \begin{enumerate}
-\item{Interpolating from particle positions to grid positions}\\
-The gravitational force on the particles manifests as singular functions in the Stokes' equation forcing function. To evaluate this force on the grid, the singular functions are regularized to the grid by representing them with regularized $\delta$-functions and evaluating these on the grid.\\ This interpolates the $M$ point forces to a forcing function on the $N^3$-grid.
+\item{\bfseries Interpolating from particle positions to grid positions}\\
+The gravitational force on the pointlike particles appear as a singular forcing function in the Stokes equations.
+To evaluate this force on the grid, the singular $\delta$-functions are approximated with regularized $\delta$-functions, as in equation \eqref{eq:singularforcingfunction}.\\
+This interpolates the $M$ point forces to a forcing function on the $N^3$-grid.
 
-\item{Solving Stokes' equation}\\
-Given the forcing function it is a matter of solving Stokes' equation. This is done using the fft (and thereby the periodicity assumption), giving the following formula derived in appendix.
+\item{\bfseries Solving the Stokes equations}\\
+Given the forcing function the Stokes flow can be calculated directly using the Stokes equations. This is done using the FFT and equation \eqref{eq:stokessolution-fourier}.
 
-\item{Interpolate the velocity field to the particle positions}\\
-This is simply done by cubic interpolation using Matlab's builtin function \emph{gridinterp}.
+\item{\bfseries Interpolate the velocity field to the particle positions}\\
+This is done by cubic interpolation using a builtin function in MATLAB, \emph{gridinterp}.
 
-\item{Timestepping the particles}\\
-Given the particle velocities, the particles' positions can now be calculated using Euler's method.
+\item{\bfseries Timestepping the particles}\\
+With the interpolated velocities as particle velocities, the particles can be moved using the forward Euler method.
 \end{enumerate}
-If the only interest is studying the velocity field solution on the grid, steps 1-2 are sufficient. This can be done for any time $t$ in the simulation, as Stokes' equation is \emph{memoryless}, it does not depend on the history of neither the velocity field nor the forcing functions.
+If the only interest is studying the velocity field solution on the grid, steps 1-2 are sufficient. This can be done for any time $t$ in the simulation, as the Stokes equations are memoryless.
+The solution does not depend on the history of neither the velocity field nor the forcing functions.
 
 \subsection{The particle cloud setup used here}
 
 Two systems of particles are studied in this article.
-One 
 The first and simplest systems has $M=3$ particles placed along a central $z$-axis in the primitive cell, two clustered to display the increase in velocity as they drag more fluid together.
-The second, larger system has a cloud of $M\approx 10^3$ particles uniformly distributed over a ball, initially in the center of the primitive cell. This is similar to the system studied in \cite{fallingclouds}.
+The second, larger system has a cloud of $M\propto 10^3$ particles uniformly distributed over a ball, initially in the center of the primitive cell. This is similar to the system studied in \cite{fallingclouds}.
 
 \section{Results}
 
@@ -344,7 +348,7 @@ where $\mathbf{v}^{nN_0}$ contains the elements $\mathbf{u}^{nN_0}_{kn}$, $k=1,2
 The solutions clearly converge as $N$ increases.
 Higher order splines yields faster convergence.
 If higher accuracy is required, increasing the spline order could be a good way of achieving it if the application allows for the wider support that comes with higher spline order.
-
+% L-SCALING
 \subsubsection{Scaling the primitive periodic cell}\label{cellscale}
 If the cloud of particles is of the same magnitude as the period $L$ of the system it is not unlikely to have interactions between clouds of different primitive cells.
 The effect of this is be studied by scaling the length of the primitive cells while keeping the particle cloud size fixed and looking at the differences between successive solutions for the velocity field in a cube of fixed size containing the particle cloud.
