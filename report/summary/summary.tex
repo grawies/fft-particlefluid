@@ -1,0 +1,28 @@
+\documentclass[a4paper,
+%twocolumn,
+twoside=false,abstract=false,numbers=noenddot,
+titlepage=false,headings=small,parskip=half,version=last]{scrartcl}
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\begin{document}
+{\Large \bf Sammanfattning}\\
+Det finns sällan vare sig tillräckligt med beräkningskraft eller analytiska lösningar för stora flerpartikelsystem i fluidsmekanik och elektrostatik.
+Simuleringar och numeriska approximationer är därför grundläggande metoder för att studera dessa system.
+Partiklarnas banor beräknas vanligen utan att direkt beräkna fluidens hastighetsfält.
+Att enbart lagra ett diskretiserat fält i tre dimensioner på ett kubiskt $N\times N\times N$-rutnät har rumskomplexiteten $O(N^3)$.
+Det är därför av stort intresse att finna effektiva och noggranna algoritmer.
+I denna rapport studeras en simuleringsmetod som utnyttjar den spektrala noggrannheten hos fouriertransformen.
+Metoden tillämpas på en periodisk kub med en suspension av små, sfäriska partiklar påverkade av gravitationen i en fluid i ett försök att efterlikna beteendet hos samma, icke-periodiska system.
+Egenskaperna hos denna metod på det periodiska systemet studeras och jämförs med liknande studier av det icke-periodiska systemet.
+
+\vspace{20mm}
+{\Large \bf Summary}\\
+Feasibly computable analytic solutions for systems of many particles in fluid dynamics and electrostatics are few and far-between.
+Simulations and numerical approximations are essential to studying these systems.
+This is commonly done without directly calculating the interacting field between particles.
+Simply storing a discretized field in a three dimensional setting on a cubic $N\times N\times N$-grid is $O(N^3)$, so finding efficient and accurate methods are of great interest.
+In this report a method utilizing the spectral accuracy of the Fourier transform is studied.
+The method is applied to a periodic cube of a suspension of small, spherical particles sedimenting in a fluid affected by gravity, in an attempt to mimic the behaviour of the infinite system.
+The properties of this method on the periodic system are examined and compared to similar studies of the infinite system.
+
+\end{document}
