@@ -356,11 +356,12 @@ Higher order splines yields faster convergence.
 If higher accuracy is required, increasing the spline order could be a good way of achieving it if the application allows for the wider support that comes with higher spline order.
 % L-SCALING
 \subsubsection{Scaling the primitive periodic cell}\label{cellscale}
-If the cloud of particles is of the same magnitude as the period $L$ of the system it is not unlikely to have interactions between clouds of different primitive cells.
-The effect of this is be studied by scaling the length of the primitive cells while keeping the particle cloud size fixed and looking at the differences between successive solutions for the velocity field in a cube of fixed size containing the particle cloud.
+If the cloud of particles is of the same magnitude as the period $L$ of the system there are quite strong interactions between clouds of different primitive cells.
+This interaction should decrease as the period of system, $L$, increases, increasing the distance between the particle clouds.
+The effect of this is studied by scaling the length of the primitive cells while keeping the particle cloud size fixed and looking at the differences between successive solutions for the velocity field in a cube of fixed size containing the particle cloud.
 The result is displayed in figure \ref{fig:len-conv/lengthvary_small}.
 For simple triangle functions, the successive relative differences decrease as $L^{-1.30}$.
-While the meaning of this measure in not entirely obvious, since for each value of $L$ a different physical system is studied, the solutions for these systems should converge to the non-periodic case as $L\rightarrow \infty$.
+While the meaning of this measure in not obvious, since for each value of $L$ a different physical system is studied, the solutions for these systems should converge to the non-periodic case as $L\rightarrow \infty$.
 \plot{len-conv/lengthvary_small}{Normed successive differences in solutions as the primitive cell increases.}
 
 % MACRO
