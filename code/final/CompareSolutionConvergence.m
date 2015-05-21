@@ -1,7 +1,8 @@
-
+%% run smooth
 L=2*pi; g = @(x,y,z) sin(L*cos(x*2*pi/L)).*cos(y*2*pi/L) + sin(z*2*pi/L);
 [ns,re] = ShowConvergence(8, 24, L, g);
-L=2.0*pi; g = @(x,y,z) sin(x).*cos(y).*(2/L^2 * z.^3 - 3/L * z.^2 + z);
+%% run nonsmooth
+L=2.0*pi; g = @(x,y,z) sin(x*2*pi/L).*cos(y*2*pi/L).*(2/L^2 * z.^3 - 3/L * z.^2 + z);
 [nsn,ren] = ShowConvergence(8, 24, L, g);
 
 %% nice plot
